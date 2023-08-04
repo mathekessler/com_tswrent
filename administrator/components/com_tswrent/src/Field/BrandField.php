@@ -1,16 +1,18 @@
 <?php
-
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   (C) 2009 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace TSWEB\Component\Tswrent\Administrator\Field;
 
 use Joomla\CMS\Form\Field\ListField;
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
 use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -18,9 +20,10 @@ use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Bannerclient field.
+ * TswrentBrand field.
  *
- * @since  1.6
+ * @since __BUMP_VERSION__
+ * 
  */
 class BrandField extends ListField
 {
@@ -28,19 +31,57 @@ class BrandField extends ListField
      * The form field type.
      *
      * @var    string
-     * @since  1.6
+     * 
+     * @since  __BUMP_VERSION__
      */
     protected $type = 'Brand';
 
-    /**
-     * Method to get the field options.
-     *
-     * @return  array  The field option objects.
-     *
-     * @since   1.6
-     */
-    public function getOptions()
-    {
-        return array_merge(parent::getOptions(), TswrentHelper::getBrandOptions());
-    }
+	/**
+	 * Create Input
+	 * @see JFormFieldList::getInput()
+	 */
+	public function getInput()
+	{
+			return parent::getInput();
+	
+	}
+
+
+	/**
+	 * Retrieve Options
+	 * @see JFormFieldList::getOptions()
+	 */
+	protected function getOptions()
+	{
+		$db    = Factory::getDbo();
+        $query = $db->getQuery(true)
+            ->select(
+                [
+                    $db->quoteName('a.id', 'value'),
+                    $db->quoteName('a.title', 'text'),
+                ]
+            )
+            ->from($db->quoteName('#__tswrent_brands', 'a'))
+            ->where($db->quoteName('a.published') . ' = 1')
+            ->order($db->quoteName('a.title'));
+
+        // Get the options.
+        $db->setQuery($query);
+
+        try {
+            $options = $db->loadObjectList();
+            
+        } catch (\RuntimeException $e) {
+            Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+        }
+
+
+        array_unshift($options, HTMLHelper::_('select.option', '0', Text::_('COM_TSWRENT_FIELD_NO_BRAND')));
+
+        // Merge any additional options in the XML definition.
+        $options = array_merge(parent::getOptions(), $options);
+
+        return $options;
+
+	}
 }

@@ -3,11 +3,13 @@
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   Copyright (C) 2005 - 2019 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+// phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -36,15 +38,15 @@ $wa->useScript('keepalive')
 	<div>
 		<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'details']); ?>
 
-			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'details', empty($this->item->id) ? Text::_('COM_TSWRENT_NEW_PRODUCT') : Text::_('COM_TSWRENT_EDIT_PRODUCT')); ?>
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'details', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_DETAIL') : Text::_('COM_TSWRENT_FIELDSET_DETAIL')); ?>
 				<div class="row">
 					<div class="col-md-12">
-						<div class="row">
-							<div class="col-md-12">
-							<?php echo $this->form->renderFieldset('details'); ?>
-				
+						<fieldset id="fieldset-detailsdata" class="options-form">
+							<legend><?php echo Text::_('COM_TSWRENT_FIELDSET_DETAIL'); ?></legend>
+							<div>
+								<?php echo $this->form->renderFieldset('details'); ?>
 							</div>
-						</div>
+						</fieldset>
 					</div>
 				</div>	
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>

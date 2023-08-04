@@ -1,13 +1,13 @@
 <?php
 /**
- * @version 4.0.0
- * @package TSWRENT
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * @package     Joomla.Administrator
+ * @subpackage  com_tswrent
+ *
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace TSWEB\Component\Tswrent\Administrator\Controller;
-
-\defined( '_JEXEC' ) or die;
 
 use Joomla\CMS\Language\Text;
 use Joomla\Utilities\ArrayHelper;
@@ -16,10 +16,14 @@ use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\Input\Input;
 
-
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Events Controller
+ * Product list controller class
+ * 
+ *  @since   __BUMP_VERSION__
  */
 class ProductsController extends AdminController
 {

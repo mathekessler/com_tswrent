@@ -1,8 +1,9 @@
 <?php
-
 /**
- * @package     STWRent
+ * @package     Joomla.Administrator
+ * @subpackage  com_tswrent
  *
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -14,27 +15,33 @@ use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseAwareTrait;
 
 
-defined('_JEXEC') or die;
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 
 /**
- * TSWRent HTML class.
+ * Tswrent HTML class.
  *
-
+ * @since  __BUMP_VERSION__
+ * 
  */
-class Tswrent
+class AdministratorService
 {
     use DatabaseAwareTrait;
-	    /**
+	
+    /**
      * Display a batch widget for the brand selector.
      *
      * @return  string  The necessary HTML for the widget.
      *
-     * @since   2.5
+     * @since   __BUMP_VERSION__
+     * 
      */
-    public function brand()
+
+    public function brands()
     {
-        
+        $brandname= 'Brand';
         // Create the batch selector to change the brand on a selection list.
         return implode(
             "\n",
@@ -43,9 +50,9 @@ class Tswrent
                 Text::_('COM_TSWRENT_BATCH_BRAND_LABEL'),
                 '</label>',
                 '<select class="form-select" name="batch[brand_id]" id="batch-brand_id">',
-                '<option value="">' . Text::_('COM_TSWRENT_BATCH_BRAND_NOCHANGE') . '</option>',
-                '<option value="0">' . Text::_('COM_TSWRENT_NO_BRAND') . '</option>',
-                HTMLHelper::_('select.options', static::brandlist(), 'value', 'text'),
+                '<option value="">' . Text::_(Text::sprintf('COM_TSWRENT_BATCH_NOCHANGE', $brandname)) . '</option>',
+                '<option value="0">' . Text::_(Text::sprintf('COM_TSWRENT_NO_VALUE', $brandname)) . '</option>',
+                HTMLHelper::_('select.options', static::brandslist(), 'value', 'text'),
                 '</select>',
             ]
         );
@@ -56,11 +63,12 @@ class Tswrent
      *
      * @return  array  The field option objects.
      *
-     * @since   1.6
+     * @since   __BUMP_VERSION__
+     * 
      */
-    public function brandlist()
+    public function brandslist()
     {
-        $db    = $this->getDatabase();
+        $db = Factory::getDbo();
         $query = $db->getQuery(true)
             ->select(
                 [
@@ -68,7 +76,7 @@ class Tswrent
                     $db->quoteName('title', 'text'),
                 ]
             )
-            ->from($db->quoteName('#__tswrent_brand'))
+            ->from($db->quoteName('#__tswrent_brands'))
             ->order($db->quoteName('title'));
 
         // Get the options.

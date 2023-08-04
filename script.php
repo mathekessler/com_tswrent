@@ -1,11 +1,15 @@
 <?php
 /**
- * @package     TSWRent
+ * @package     Joomla.Administrator
+ * @subpackage  com_tswrent
  *
  * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
+
+// phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Factory;
@@ -13,15 +17,14 @@ use Joomla\CMS\Installer\InstallerAdapter;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Table\Table;
-
-
+use Joomla\CMS\Installer\InstallerScript;
 
 /**
  * Script file of TSWRent Component
  *
  * @since  __BUMP_VERSION__
  */
-class Com_TswrentInstallerScript
+class Com_TswrentInstallerScript extends InstallerScript
 {
 	/**
 	 * Minimum Joomla version to check
@@ -96,7 +99,7 @@ class Com_TswrentInstallerScript
 			return false;
 		}
 
-
+		$this->addDashboardMenu('tswrent', 'tswrent');
 		return true;
 	}
 
@@ -124,12 +127,11 @@ class Com_TswrentInstallerScript
 	 * @return  boolean  True on success
 	 *
 	 * @since  __BUMP_VERSION__
-	 *
 	 */
 	public function update($parent): bool
 	{
 		echo Text::_('COM_TSWRENT_INSTALLERSCRIPT_UPDATE');
-
+		
 		return true;
 	}
 
@@ -193,7 +195,14 @@ class Com_TswrentInstallerScript
 
 		return true;
 	}
-
+	
+	/**
+	 * Retrieve the admin user id.
+	 *
+	 * @return  integer|boolean  One Administrator ID.
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
 	private function getAdminId()
 	{
 		$db    = Factory::getDbo();

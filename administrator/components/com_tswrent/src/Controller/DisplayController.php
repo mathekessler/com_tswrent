@@ -1,7 +1,9 @@
 <?php
-
 /**
- * @package     TSWRent
+ * @package     Joomla.Administrator
+ * @subpackage  com_tswrent
+ *
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -11,13 +13,17 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
 
-defined('_JEXEC') or die;
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 
 /**
  * TSWRent display controller.
  *
+ * @since   __BUMP_VERSION__
  */
+
 class DisplayController extends BaseController
 {
     /**
@@ -35,6 +41,7 @@ class DisplayController extends BaseController
      *
      * @return  BaseController|boolean  This object to support chaining.
      *
+     * @since   __BUMP_VERSION__
      */
     public function display($cachable = false, $urlparams = [])
     {

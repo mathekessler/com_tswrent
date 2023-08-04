@@ -9,6 +9,7 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\View\Product;
 
+use Exception;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Factory;
@@ -18,13 +19,17 @@ use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use TSWEB\Component\Tswrent\Administrator\Model\ProductModel;
 
+// phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 /**
- * View to edit a product.
+ * View class to edit a product.
  *
  * @since  __BUMP_VERSION__
+ * 
  */
 class HtmlView extends BaseHtmlView
 {
@@ -46,9 +51,17 @@ class HtmlView extends BaseHtmlView
 	 * The model state
 	 *
 	 * @var    object
-	 * @since  1.5
 	 */
 	protected $state;
+
+	/**
+     * Object containing permissions for the item
+     *
+     * @var    CMSObject
+     * 
+     * @since  __BUMP_VERSION__
+     */
+    protected $canDo;
 
 	/**
 	 * Display the view.
@@ -56,13 +69,18 @@ class HtmlView extends BaseHtmlView
 	 * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
 	 *
 	 * @return  mixed  A string if successful, otherwise an Error object.
+	 * 
+	 *  @since   __BUMP_VERSION__
+	 * 
 	 */
-	public function display($tpl = null)
+	public function display($tpl = null): void
 	{
-		// Initialise variables.
-		$this->state = $this->get('State');
-		$this->item	 = $this->get('Item');
-		$this->form	 = $this->get('Form');
+        /** @var SupplierModel $model */
+        $model       = $this->getModel();
+        $this->form  = $model->getForm();
+        $this->item  = $model->getItem();
+        $this->state = $model->getState();
+        $this->canDo = ContentHelper::getActions('com_tswrent');
 		
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
@@ -74,7 +92,7 @@ class HtmlView extends BaseHtmlView
         $this->addToolbar();
 
 
-		return parent::display($tpl);
+		parent::display($tpl);
 	}
 
 	/**
@@ -83,6 +101,7 @@ class HtmlView extends BaseHtmlView
 	 * @return  void
 	 *
 	 * @since   __BUMP_VERSION__
+	 * 
 	 */
 	protected function addToolbar()
 	{
@@ -92,12 +111,12 @@ class HtmlView extends BaseHtmlView
 		$userId 	= $user->id;
 		$isNew 		= ($this->item->id == 0);
 		$checkedOut = !(\is_null($this->item->checked_out) || $this->item->checked_out == $userId);
-        $toolbar    = Toolbar::getInstance();
+        $canDo      = $this->canDo;
+		$toolbar    = Toolbar::getInstance();
 
-        // Since we don't track these assets at the item level, use the category id.
-        $canDo = ContentHelper::getActions('com_tswrent', 'category', $this->item->catid);
-
-		ToolbarHelper::title($isNew ? Text::_('COM_TSWRENT_MANAGER_PRODUCT_NEW') : Text::_('COM_TSWRENT_MANAGER_PRODUCT_EDIT'), 'bookmark products');
+		ToolbarHelper::title(
+			$isNew ? Text::_('COM_TSWRENT_MANAGER_PRODUCT_NEW') : Text::_('COM_TSWRENT_MANAGER_PRODUCT_EDIT'), 
+			'bookmark tswrent-products');
 
         // If not checked out, can save the item.
         if (!$checkedOut && ($canDo->get('core.edit') || \count($user->getAuthorisedCategories('com_tswrent', 'core.create')) > 0)) {
@@ -135,7 +154,7 @@ class HtmlView extends BaseHtmlView
         }
 
 
-		ToolbarHelper::divider();
-		ToolbarHelper::help('', false, 'http://example.org');
+        $toolbar->divider();
+        $toolbar->help('Banners:_New_or_Edit_Product');
 	}
 }

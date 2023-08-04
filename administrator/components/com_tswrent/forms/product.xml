@@ -6,7 +6,7 @@
 			name="title" 
 			type="text"
 			size="40"
-			label="COM_TSWRENT_PRODUCT_TITLE"
+			label="JGLOBAL_TITLE"
 			required="true"
 		/>
 		<field 
@@ -24,32 +24,35 @@
 			type="categoryedit"
 			label="JCATEGORY"
 			extension="com_tswrent"
-			addfieldprefix="Joomla\Component\Categories\Administrator\Field"
 			required="true"
+			addfieldprefix="Joomla\Component\Categories\Administrator\Field"
 			default=""
+			class="advancedSelect"
 		/>
+
 		<field 
 			name="description"
 			type="textarea"
-			label="COM_TSWRENT_DESCRIPTION"
+			label="COM_TSWRENT_FIELD_DESCRIPTION"
 		/>
 		<field 
-			name="brand" 
+			name="brand_id" 
 			type="brand"
 			label="COM_TSWRENT_BRAND"
-	
+			validate="options"
+			
 		/>
 		<field 
 			name="price"
 			type="number"
-			label="COM_TSWRENT_PRICE"
+			label="COM_TSWRENT_FIELD_PRICE"
 			step="0.05"
 			required="true"
 		/>
 		<field
 			name="unit"
 			type="list"
-			label="COM_TSWRENT_UNIT"
+			label="COM_TSWRENT_FIELD_UNIT"
 			default="0"	
 			>
 			<option value="0">COM_TSWRENT_PER_DAY</option>
@@ -65,21 +68,21 @@
 
 		<field 
 			name="weight"
-			type="weight"
-			label="COM_TSWRENT_WEIGHT"
+			type="number"
+			step="0.1"
+			default="0"
+			label="COM_TSWRENT_FIELD_WEIGHT"
 		/>
 		<field 
 			name="stock"
 			type="number"
-			label="COM_TSWRENT_STOCK"
+			label="COM_TSWRENT_FIELD_STOCK"
 			default= "0"
 		/>
 
 		<field 
 			name="productimage" 
 			type="media"
-			label="COM_TSWRENT_IMAGESELECT"
-			description="COM_TSWRENT_IMAGESELECT"
 			required="false"
 		/>
 		<field
@@ -118,13 +121,13 @@
 		<field
 			name="created_by_alias"
 			type="text"
-			label="COM_CONTACT_FIELD_CREATED_BY_ALIAS_LABEL"
+			label="JGLOBAL_FIELD_CREATED_BY_ALIAS_LABEL"
 		/>
 
 		<field
 			name="created"
 			type="calendar"
-			label="COM_CONTACT_FIELD_CREATED_LABEL"
+			label="JGLOBAL_FIELD_CREATED_LABEL"
 			translateformat="true"
 			showtime="true"
 			filter="user_utc"

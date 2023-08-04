@@ -1,16 +1,20 @@
 <?php
 /**
  * @package     Joomla.Administrator
- * @subpackage  com_jem
+ * @subpackage  com_tswrent
  *
- * @copyright   (C) 2015 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
-defined('_JEXEC') or die;
+
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\Language\Text;
 
 ?>
+
 <button type="button" class="btn btn-secondary" onclick="document.getElementById('batch-category-id').value='';document.getElementById('batch-brand_id').value='';" data-bs-dismiss="modal">
     <?php echo Text::_('JCANCEL'); ?>
 </button>

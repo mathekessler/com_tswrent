@@ -3,11 +3,13 @@
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   (C) 2015 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
-defined('_JEXEC') or die;
 
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Layout\LayoutHelper;
@@ -19,7 +21,7 @@ $published = (int) $this->state->get('filter.published');
     <div class="row">
         <div class="form-group col-md-6">
             <div class="controls">
-                <?php echo HTMLHelper::_('tswrent.brand'); ?>
+                <?php echo HTMLHelper::_('tswrentadministrator.brands'); ?>
             </div>
         </div>
     </div>

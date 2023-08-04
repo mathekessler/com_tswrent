@@ -1,25 +1,20 @@
 <?php
-
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   (C) 2005 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace TSWEB\Component\Tswrent\Administrator\Table;
 
 use Joomla\CMS\Application\ApplicationHelper;
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
-use Joomla\CMS\Versioning\VersionableTableInterface;
 use Joomla\Database\DatabaseDriver;
-use Joomla\Database\ParameterType;
+use Joomla\CMS\Language\Text;
 use Joomla\Registry\Registry;
-use Joomla\Utilities\ArrayHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -28,33 +23,26 @@ use Joomla\Utilities\ArrayHelper;
 /**
  * Product table
  *
- * @since  1.5
+ * @since  __BUMP_VERSION__
+ * 
  */
-class ProductTable extends Table implements VersionableTableInterface
+class ProductTable extends Table
 {
-    /**
-     * Indicates that columns fully support the NULL value in the database
-     *
-     * @var    boolean
-     * @since  4.0.0
-     */
-    protected $_supportNullValue = true;
-
     /**
      * Constructor
      *
      * @param   DatabaseDriver  $db  Database connector object
      *
-     * @since   1.5
+     * @since   __BUMP_VERSION__
+     * 
      */
     public function __construct(DatabaseDriver $db)
     {
         $this->typeAlias = 'com_tswrent.product';
 
-        parent::__construct('#__tswrent_product', 'id', $db);
+        parent::__construct('#__tswrent_products', 'id', $db);
 
     }
-
 
     /**
      * Overloaded check function
@@ -62,7 +50,9 @@ class ProductTable extends Table implements VersionableTableInterface
      * @return  boolean
      *
      * @see     Table::check
-     * @since   1.5
+     * 
+     * @since   __BUMP_VERSION__
+     * 
      */
     public function check()
     {
@@ -75,14 +65,13 @@ class ProductTable extends Table implements VersionableTableInterface
         }
 
         // Set name
-        $this->name = htmlspecialchars_decode($this->title, ENT_QUOTES);
+        $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
 
         // Set alias
         if (trim($this->alias) == '') {
             $this->alias = $this->title;
         }
-
-        $this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
+		$this->alias = ApplicationHelper::stringURLSafe($this->alias);
 
         if (trim(str_replace('-', '', $this->alias)) == '') {
             $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
@@ -100,33 +89,6 @@ class ProductTable extends Table implements VersionableTableInterface
             $this->created = Factory::getDate()->toSql();
         }
 
-        // Set publish_up, publish_down to null if not set
-        if (!$this->publish_up) {
-            $this->publish_up = null;
-        }
-
-        if (!$this->publish_down) {
-            $this->publish_down = null;
-        }
-
-        // Check the publish down date is not earlier than publish up.
-        if (!\is_null($this->publish_down) && !\is_null($this->publish_up) && $this->publish_down < $this->publish_up) {
-            $this->setError(Text::_('JGLOBAL_START_PUBLISH_AFTER_FINISH'));
-
-            return false;
-        }
-
-
-        // Set modified to created if not set
-        if (!$this->modified) {
-            $this->modified = $this->created;
-        }
-
-        // Set modified_by to created_by if not set
-        if (empty($this->modified_by)) {
-            $this->modified_by = $this->created_by;
-        }
-
         return true;
     }
 
@@ -138,7 +100,8 @@ class ProductTable extends Table implements VersionableTableInterface
      *
      * @return  boolean  True on success
      *
-     * @since   1.5
+     * @since   __BUMP_VERSION__
+     * 
      */
     public function bind($array, $ignore = [])
     {
@@ -160,24 +123,59 @@ class ProductTable extends Table implements VersionableTableInterface
      * @param   boolean  $updateNulls  True to update fields even if they are null.
      *
      * @return  boolean  True on success, false on failure.
+     * 
+     * @since   __BUMP_VERSION__
+     * 
      */
     public function store($updateNulls = true)
     {
+        $date = Factory::getDate()->toSql();
+		$user = Factory::getApplication()->getIdentity();
+
+		$this->modified = $date;
+
+		if ($this->id)
+		{
+			// Existing item
+			$this->modified_by = $user->id;
+			$this->modified    = $date;
+		}
+		else
+		{
+			// New weblink. A weblink created and created_by field can be set by the user,
+			// so we don't touch either of these if they are set.
+			if (!(int) $this->created)
+			{
+				$this->created = $date;
+			}
+
+			if (empty($this->created_by))
+			{
+				$this->created_by = $user->id;
+			}
+
+			if (!(int) $this->modified)
+			{
+				$this->modified = $date;
+			}
+
+			if (empty($this->modified_by))
+			{
+				$this->modified_by = $user->id;
+			}
+            // Verify that the alias is unique
+            $table = new ProductTable($this->getDbo());
+
+            if ($table->load(array('alias' => $this->alias))
+                && ($table->id != $this->id || $this->id == 0))
+            {
+                $this->setError(Text::_('COM_TSWRENT_ERROR_UNIQUE_ALIAS'));
+
+                return false;
+            }
+
+        }
         
         return parent::store($updateNulls);
-    }
-
-
-
-    /**
-     * Get the type alias for the history table
-     *
-     * @return  string  The alias as described above
-     *
-     * @since   4.0.0
-     */
-    public function getTypeAlias()
-    {
-        return $this->typeAlias;
     }
 }

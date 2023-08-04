@@ -1,4 +1,8 @@
-CREATE TABLE IF NOT EXISTS `#__tswrent_brand` (
+--
+-- Table structure for table `#__tswrent_brands`
+--
+
+CREATE TABLE IF NOT EXISTS `#__tswrent_brands` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
@@ -10,14 +14,28 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_brand` (
   `modified_by` int(10) unsigned NOT NULL DEFAULT 0,
   `published` tinyint(4) NOT NULL DEFAULT 0,
   `website`text NOT NULL,
-  `supplier_id` text NOT NULL,
 
   PRIMARY KEY (`id`),
   KEY `idx_supplier_id` (`supplier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Table structure for table `#__tswrent_brand_supplyer_relation`
+--
 
-CREATE TABLE IF NOT EXISTS `#__tswrent_order` (
+CREATE TABLE IF NOT EXISTS `#__tswrent_brand_supplier_relation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `supplier_id` int(10) unsigned NOT NULL DEFAULT 0,
+  
+  PRIMARY KEY (`id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Table structure for table `#__tswrent_orders`
+--
+
+CREATE TABLE IF NOT EXISTS `#__tswrent_orders` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
@@ -39,6 +57,10 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_order` (
   KEY `idx_startdate` (`startdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Table structure for table `#__tswrent_order_product`
+--
+
 CREATE TABLE IF NOT EXISTS `#__tswrent_order_product` (
   `id` int NOT NULL AUTO_INCREMENT,
   `product_id` tinyint(10) unsigned NOT NULL DEFAULT 0,
@@ -55,7 +77,10 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_order_product` (
   KEY `idx_product_id` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `#__tswrent_product` (
+--
+-- Table structure for table `#__tswrent_products`
+--
+CREATE TABLE IF NOT EXISTS `#__tswrent_products` (
   `id` int (11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL ,
   `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
@@ -74,13 +99,18 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_product` (
   `unit` varchar(255) NOT NULL DEFAULT '',
   `weight` decimal(7,2) unsigned NOT NULL DEFAULT 0,
   `stock` int(5) unsigned NOT NULL DEFAULT 0,
+  `consumable`tinyint(4) NOT NULL DEFAULT 0,
 
   PRIMARY KEY (`id`),
   KEY `idx_brand_id` (`brand_id`),
   KEY `idx_catid` (`catid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `#__tswrent_supplier` (
+--
+-- Table structure for table `#__tswrent_suppliers`
+--
+
+CREATE TABLE IF NOT EXISTS `#__tswrent_suppliers` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '',
   `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
@@ -93,13 +123,38 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_supplier` (
   `published` tinyint(4) NOT NULL DEFAULT 0,
   `address` text NOT NULL,
   `city` varchar(100),
-  `postcode` int(100),
+  `postalcode` int(100),
   `telephone` varchar(255)NOT NULL DEFAULT '',
   `mobile` varchar(255)NOT NULL DEFAULT '',
   `website`text NOT NULL DEFAULT '',
   `email_to` varchar(255)NOT NULL DEFAULT '',
-  `brand_id` tinyint(4) NOT NULL DEFAULT 0,
+  `supplyer_employee_id` tinyint(4) NOT NULL DEFAULT 0,
 
   PRIMARY KEY (`id`),
   KEY `idx_brand_id`(`brand_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Table structure for table `#__tswrent_supplier_employee`
+--
+
+CREATE TABLE IF NOT EXISTS `#__tswrent_supplieremployee` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `description` mediumtext NOT NULL,
+  `created` datetime NOT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_by_alias` varchar(255) NOT NULL DEFAULT '',
+  `modified` datetime NOT NULL,
+  `modified_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `published` tinyint(4) NOT NULL DEFAULT 0,
+  `ordering` int(10) NOT NULL DEFAULT 0,
+  `telephone` varchar(255)NOT NULL DEFAULT '',
+  `mobile` varchar(255)NOT NULL DEFAULT '',
+  `email_to` varchar(255)NOT NULL DEFAULT '',
+  `supplier_id` tinyint(4) NOT NULL DEFAULT 0,
+
+  PRIMARY KEY (`id`),
+  KEY `idx_supplier_id`(`supplier_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;

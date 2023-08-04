@@ -1,24 +1,27 @@
 <?php
 /**
- * @version 4.0.0
- * @package JEM
- * @copyright (C) 2013-2021 joomlaeventmanager.net
- * @copyright (C) 2005-2009 Christoph Lukes
- * @license http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * @package     Joomla.Administrator
+ * @subpackage  com_tswrent
+ *
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
-\defined('_JEXEC') or die;
-
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\CMS\Table\Table;
 use Joomla\Database\ParameterType;
 
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Model-Events
+ * Products model
+ * 
+ * @since  __BUMP_VERSION__
+ * 
  **/
 class ProductsModel extends ListModel
 {
@@ -26,11 +29,17 @@ class ProductsModel extends ListModel
 	
 	/**
 	 * Constructor.
+	 *
+	 * @param   array  $config  An optional associative array of configuration settings.
+	 *
+	 * @see     \JControllerLegacy
+	 *
+	 * @since   __BUMP_VERSION__
 	 */
 	public function __construct($config = [])
 	{
 		if (empty($config['filter_fields'])) {
-			$config['filter_fields'] = [
+			$config['filter_fields'] = array(
 				'id', 'a.id',	
 				'alias', 'a.alias',
 				'title', 'a.title','name',
@@ -38,7 +47,7 @@ class ProductsModel extends ListModel
 				'catid', 'a.catid', 'category_id', 'category_title',
 				'brand', 'a.brand', 'brand_id',
 				'stock', 'a.stock',
-			];
+			);
 		}
 
 		parent::__construct($config);
@@ -48,7 +57,10 @@ class ProductsModel extends ListModel
 	/**
 	 * Build an SQL query to load the list data.
 	 *
-	 * @return JDatabaseQuery
+	 * @return  \JDatabaseQuery
+	 *
+	 * @since   __BUMP_VERSION__
+	 * 
 	 */
 	protected function getListQuery()
 	{
@@ -79,9 +91,13 @@ class ProductsModel extends ListModel
 			]
 		)
 
-		->from($db->quoteName('#__tswrent_product', 'a'))
-		->join('LEFT', $db->quoteName('#__tswrent_brand', 'b'), $db->quoteName('b.id') . ' = ' . $db->quoteName('a.brand_id'))
-		->join('LEFT', $db->quoteName('#__categories', 'c'), $db->quoteName('c.id') . ' = ' . $db->quoteName('a.catid'));
+		->from($db->quoteName('#__tswrent_products', 'a'))
+		->join('LEFT', $db->quoteName('#__tswrent_brands', 'b'), $db->quoteName('b.id') . ' = ' . $db->quoteName('a.brand_id'))
+		->join(
+			'LEFT', 
+			$db->quoteName('#__categories', 'c'),
+			$db->quoteName('c.id') . '=' . $db->quoteName('a.catid')
+			.'OR'.$db->quoteName('c.parent_id'). '=' . $db->quoteName('a.catid'));
 
 		// Filter by search in title
 		if ($search = $this->getState('filter.search')) {
@@ -110,9 +126,24 @@ class ProductsModel extends ListModel
 
 		if (is_numeric($categoryId)) {
 			$categoryId = (int) $categoryId;
-			$query->where($db->quoteName('a.catid') . ' = :categoryId')
-				->bind(':categoryId', $categoryId, ParameterType::INTEGER);
+			$query->where($db->quoteName('c.id') . '= :categoryId OR'.$db->quoteName('c.parent_id') . '= :cparentId')
+				->bind([':categoryId',':cparentId'], $categoryId, ParameterType::INTEGER);
+
 		}
+		// Filter by brand.
+		$brandId = $this->getState('filter.brand_id');
+
+		if (is_numeric($brandId)) {
+			$brandId = (int) $brandId;
+			$query->where($db->quoteName('a.brand_id') . ' = :brandId')
+				->bind(':brandId', $brandId, ParameterType::INTEGER);
+		}
+		
+		// Add the list ordering clause.
+		$orderCol = $this->state->get('list.ordering', 'a.title');
+		$orderDirn = $this->state->get('list.direction', 'asc');
+
+		$query->order($db->escape($orderCol . ' ' . $orderDirn));
 
 		return $query;
 	}
@@ -129,11 +160,8 @@ class ProductsModel extends ListModel
 	 *
 	 * @since   __BUMP_VERSION__
 	 */
-    protected function populateState($ordering = 'a.name', $direction = 'asc')
+    protected function populateState($ordering = 'a.title', $direction = 'asc')
     {
-        // Load the parameters.
-        $this->setState('params', ComponentHelper::getParams('com_tswrent'));
-
         // List state information.
         parent::populateState($ordering, $direction);
     }

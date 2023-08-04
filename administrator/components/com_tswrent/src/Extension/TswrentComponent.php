@@ -1,10 +1,9 @@
 <?php
-
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   (C) 2018 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -17,32 +16,24 @@ use Joomla\CMS\Component\Router\RouterServiceTrait;
 use Joomla\CMS\Extension\BootableExtensionInterface;
 use Joomla\CMS\Extension\MVCComponent;
 use Joomla\CMS\HTML\HTMLRegistryAwareTrait;
-use Joomla\CMS\Tag\TagServiceInterface;
-use Joomla\CMS\Tag\TagServiceTrait;
-use TSWEB\Component\Tswrent\Administrator\Service\HTML\Tswrent;
-use Joomla\Database\DatabaseInterface;
+use TSWEB\Component\Tswrent\Administrator\Service\HTML\AdministratorService;
+use Joomla\CMS\Helper\ContentHelper;
 use Psr\Container\ContainerInterface;
 
-
-
-\defined('JPATH_PLATFORM') or die;
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 /**
  * Component class for com_tswrent
  *
+ *  @since   __BUMP_VERSION__
  */
-class TswrentComponent extends MVCComponent implements
-  BootableExtensionInterface,
-  CategoryServiceInterface,
-  RouterServiceInterface,
-  TagServiceInterface
+class TswrentComponent extends MVCComponent implements BootableExtensionInterface, CategoryServiceInterface, RouterServiceInterface
 {
-  use HTMLRegistryAwareTrait;
-  use RouterServiceTrait;
-  use CategoryServiceTrait, TagServiceTrait {
-      CategoryServiceTrait::getTableNameForSection insteadof TagServiceTrait;
-      CategoryServiceTrait::getStateColumnForSection insteadof TagServiceTrait;
-  }
+	use CategoryServiceTrait;
+	use HTMLRegistryAwareTrait;
+	use RouterServiceTrait;
 
 
   /**
@@ -56,14 +47,13 @@ class TswrentComponent extends MVCComponent implements
      *
      * @return  void
      *
+     *  @since   __BUMP_VERSION__
   */
 
   public function boot(ContainerInterface $container)
   {
-    $tswrent = new Tswrent();
-    $tswrent->setDatabase($container->get(DatabaseInterface::class));
 
-    $this->getRegistry()->register('tswrent', $tswrent);
+    $this->getRegistry()->register('tswrentadministrator', new AdministratorService);
 
   }
 
@@ -76,11 +66,11 @@ class TswrentComponent extends MVCComponent implements
      *
      * @return  string|null
      *
-     * @since   4.0.0
+     *  @since   __BUMP_VERSION__
      */
     protected function getTableNameForSection(string $section = null)
     {
-        return ($section === 'category' ? 'categories' : 'tswrent_product');
+        return ($section === 'category' ? 'categories' : 'tswrent_products');
     }
 
     /**

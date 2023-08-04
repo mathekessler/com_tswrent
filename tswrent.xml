@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <extension type="component" method="upgrade">
 	<name>COM_TSWRENT</name>
-	<creationDate>30.07.2023</creationDate>
-	<author>Mathe Kessler</author>
+	<author>TSWEB Mathe Kessler</author>
+	<creationDate>2023-07</creationDate>
+	<copyright>(C) 2005 - 2021 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>admin@tonschmiede.ch</authorEmail>
 	<authorUrl>tonschmiede.ch</authorUrl>
-	<copyright>[COPYRIGHT]</copyright>
-	<license>GNU General Public License version 2 or later;</license>
 	<version>__BUMP_VERSION__</version>
 	<description>COM_TSWRENT_INSTALLATION_DESCRIPTION</description>
 	
@@ -34,12 +35,26 @@
 	<administration>
 		
 		<!-- Menu entries -->
-		<menu img="class:address-book">COM_TSWRENT</menu>
+		<menu img="class:comment">
+			COM_TSWRENT
+
+		</menu>
 		<submenu>
-			<menu link="option=com_tswrent" img="class:products"
-				alt="Tswrent/Products">COM_TSWRENT_PRODUCTS</menu>
-			<menu link="option=com_categories&amp;extension=com_tswrent"
-					img="class:address-book">JCATEGORY</menu>
+			<menu 
+				link="option=com_tswrent" 
+				img="class:tswrent-cat"
+				alt="Tswrent/Products"
+				>
+				COM_TSWRENT_PRODUCTS
+			</menu>
+			<menu 
+				link="option=com_categories&amp;extension=com_tswrent"
+				view="categories"
+				img="class:tswrent-cat"
+				alt="Tswrent/Categories"
+				>
+				JCATEGORY
+			</menu>		
 			<menu
 				link="option=com_tswrent&amp;view=orders"
 				view="orders"
@@ -48,13 +63,40 @@
 				>
 				COM_TSWRENT_ORDERS
 			</menu>
-
-
+			<menu
+				link="option=com_tswrent&amp;view=brands"
+				view="brands"
+				img="class:tswrent-brands"
+				alt="Tswrent/Brands"
+				>
+				COM_TSWRENT_BRANDS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=suppliers"
+				view="suppliers"
+				img="class:tswrent-suppliers"
+				alt="Tswrent/Supplyers"
+				>
+				COM_TSWRENT_SUPPLIERS
+			</menu>	
+			<menu
+				link="option=com_tswrent&amp;view=supplieremployees"
+				view="supplyers_employees"
+				img="class:tswrent-supplyer_employees"
+				alt="Tswrent/Supplyer/Employees"
+				>
+				COM_TSWRENT_SUPPLIEREMPLOYEES
+			</menu>
 		</submenu>
 		
+		<dashboards>
+				<dashboard title="COM_EXAMPLE_DASHBOARD_TITLE" icon="icon-lock">tswrent</dashboard>
+		</dashboards>
 		<files folder="administrator/components/com_tswrent">
 			<filename>access.xml</filename>
+			<filename>config.xml</filename>
 			<folder>forms</folder>
+			<folder>presets</folder>
 			<folder>services</folder>
 			<folder>sql</folder>
 			<folder>src</folder>

@@ -1,43 +1,42 @@
 <?php
-
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   (C) 2008 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
+use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
-use Joomla\CMS\Table\TableInterface;
-use Joomla\CMS\Versioning\VersionableModelTrait;
 use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
-use Joomla\Database\ParameterType;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Banner model.
+ * Product model.
  *
- * @since  1.6
+ * @since  __BUMP_VERSION__
+ * 
  */
 class ProductModel extends AdminModel
 {
-    use VersionableModelTrait;
 
     /**
      * The prefix to use with controller messages.
      *
      * @var    string
-     * @since  1.6
+     * 
+     * @since  __BUMP_VERSION__
+     * 
      */
     protected $text_prefix = 'COM_TSWRENT_PRODUCT';
 
@@ -45,13 +44,16 @@ class ProductModel extends AdminModel
      * The type alias for this content type.
      *
      * @var    string
-     * @since  3.2
+     * @since  __BUMP_VERSION__
+     * 
      */
     public $typeAlias = 'com_tswrent.product';
     /**
      * Batch copy/move command. If set to false, the batch copy/move command is not supported
      *
      * @var  string
+     * 
+     *  @since   __BUMP_VERSION__
      */
     protected $batch_copymove = 'category_id';
 
@@ -59,14 +61,16 @@ class ProductModel extends AdminModel
      * Allowed batch commands
      *
      * @var  array
+     * 
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected $batch_commands = [
         'brand_id'   => 'batchBrand',
-
     ];
 
  /**
-     * Batch client changes for a group of tswrent.
+     * Batch protuct changes for a group of products.
      *
      * @param   string  $value     The new value matching a client.
      * @param   array   $pks       An array of row IDs.
@@ -74,7 +78,8 @@ class ProductModel extends AdminModel
      *
      * @return  boolean  True if successful, false otherwise and internal error is set.
      *
-     * @since   2.5
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function batchBrand($value, $pks, $contexts)
     {
@@ -116,11 +121,12 @@ class ProductModel extends AdminModel
      *
      * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function canDelete($record)
     {
-        if (empty($record->id) || $record->state != -2) {
+        if (empty($record->id) || $record->published != -2) {
             return false;
         }
 
@@ -132,32 +138,14 @@ class ProductModel extends AdminModel
     }
 
     /**
-     * A method to preprocess generating a new title in order to allow tables with alternative names
-     * for alias and title to use the batch move and copy methods
-     *
-     * @param   integer  $categoryId  The target category id
-     * @param   Table    $table       The JTable within which move or copy is taking place
-     *
-     * @return  void
-     *
-     * @since   3.8.12
-     */
-    public function generateTitle($categoryId, $table)
-    {
-        // Alter the title & alias
-        $data         = $this->generateNewTitle($categoryId, $table->alias, $table->title);
-        $table->title  = $data['0'];
-        $table->alias = $data['1'];
-    }
-
-    /**
      * Method to test whether a record can have its state changed.
      *
      * @param   object  $record  A record object.
      *
      * @return  boolean  True if allowed to change the state of the record. Defaults to the permission set in the component.
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function canEditState($record)
     {
@@ -178,7 +166,8 @@ class ProductModel extends AdminModel
      *
      * @return  Form|boolean  A Form object on success, false on failure
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     public function getForm($data = [], $loadData = true)
     {
@@ -197,12 +186,14 @@ class ProductModel extends AdminModel
      *
      * @return  mixed  The data for the form.
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function loadFormData()
     {
-        // Check the session for previously entered form data.
         $app  = Factory::getApplication();
+        
+        // Check the session for previously entered form data.
         $data = $app->getUserState('com_tswrent.edit.product.data', []);
 
         if (empty($data)) {
@@ -210,14 +201,14 @@ class ProductModel extends AdminModel
 
             // Prime some default values.
             if ($this->getState('product.id') == 0) {
-                $filters     = (array) $app->getUserState('com_tswrent.Products.filter');
+                $filters     = (array) $app->getUserState('com_tswrent.products.filter');
                 $filterCatId = $filters['category_id'] ?? null;
 
                 $data->set('catid', $app->getInput()->getInt('catid', $filterCatId));
             }
-        }
 
-        $this->preprocessData('com_tswrent.products', $data);
+        }
+        $this->preprocessData('com_tswrent.product', $data);
 
         return $data;
     }
@@ -231,16 +222,14 @@ class ProductModel extends AdminModel
      *
      * @return  array  An array of conditions to add to ordering queries.
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function getReorderConditions($table)
     {
-        $db = $this->getDatabase();
-
-        return [
-            $db->quoteName('catid') . ' = ' . (int) $table->catid,
-            $db->quoteName('published') . ' >= 0',
-        ];
+        $condition   = array();
+		$condition[] = 'catid = ' . (int) $table->catid;
+        return $condition;
     }
 
     /**
@@ -250,14 +239,24 @@ class ProductModel extends AdminModel
      *
      * @return  void
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function prepareTable($table)
     {
         $date = Factory::getDate();
-        $user = $this->getCurrentUser();
+		$user = Factory::getApplication()->getIdentity();
 
-        if (empty($table->id)) {
+		$table->title = htmlspecialchars_decode($table->title, ENT_QUOTES);
+		$table->alias = ApplicationHelper::stringURLSafe($table->alias);
+
+		if (empty($table->alias))
+		{
+			$table->alias = ApplicationHelper::stringURLSafe($table->title);
+		}
+
+		if (empty($table->id))
+		{
             // Set the values
             $table->created    = $date->toSql();
             $table->created_by = $user->id;
@@ -281,7 +280,8 @@ class ProductModel extends AdminModel
      *
      * @return  void
      *
-     * @since    3.6.1
+     *  @since   __BUMP_VERSION__
+     * 
      */
     protected function preprocessForm(Form $form, $data, $group = 'content')
     {
@@ -302,80 +302,87 @@ class ProductModel extends AdminModel
      *
      * @return  boolean  True on success.
      *
-     * @since   1.6
+     *  @since   __BUMP_VERSION__
+     * 
      */
     public function save($data)
     {
-        $input = Factory::getApplication()->getInput();
+		$app = Factory::getApplication();
 
-        // Create new category, if needed.
-        $createCategory = true;
+        // Cast catid to integer for comparison
+        $catid = (int) $data['catid'];
 
-        // If category ID is provided, check if it's valid.
-        if (is_numeric($data['catid']) && $data['catid']) {
-            $createCategory = !CategoriesHelper::validateCategoryId($data['catid'], 'com_tswrent');
+        // Check if New Category exists
+        if ($catid > 0)
+        {
+            $catid = CategoriesHelper::validateCategoryId($data['catid'], 'com_tswrent');
         }
 
         // Save New Category
-        if ($createCategory && $this->canCreateCategory()) {
-            $category = [
-                // Remove #new# prefix, if exists.
-                'title'     => strpos($data['catid'], '#new#') === 0 ? substr($data['catid'], 5) : $data['catid'],
-                'parent_id' => 1,
-                'extension' => 'com_tswrent',
-                'published' => 1,
-            ];
+        if ($catid == 0 && $this->canCreateCategory())
+        {
+            $table              = array();
+            $table['title']     = $data['catid'];
+            $table['parent_id'] = 1;
+            $table['extension'] = 'com_tswrent';
+            $table['language']  = $data['language'];
+            $table['published'] = 1;
 
-            /** @var \Joomla\Component\Categories\Administrator\Model\CategoryModel $categoryModel */
-            $categoryModel = Factory::getApplication()->bootComponent('com_categories')
-                ->getMVCFactory()->createModel('Category', 'Administrator', ['ignore_request' => true]);
-
-            // Create new category.
-            if (!$categoryModel->save($category)) {
-                $this->setError($categoryModel->getError());
-
-                return false;
-            }
-
-            // Get the new category ID.
-            $data['catid'] = $categoryModel->getState('category.id');
+            // Create new category and get catid back
+            $data['catid'] = CategoriesHelper::createCategory($table);
         }
 
-        // Alter the name for save as copy
-        if ($input->get('task') == 'save2copy') {
-            /** @var \Joomla\Component\Tswrent\Administrator\Table\BannerTable $origTable */
-            $origTable = clone $this->getTable();
-            $origTable->load($input->getInt('id'));
-
-            if ($data['name'] == $origTable->name) {
-                list($name, $alias) = $this->generateNewTitle($data['catid'], $data['alias'], $data['name']);
-                $data['name']       = $name;
-                $data['alias']      = $alias;
-            } else {
-                if ($data['alias'] == $origTable->alias) {
-                    $data['alias'] = '';
-                }
-            }
-
-            $data['published'] = 0;
-        }
-
-        if ($input->get('task') == 'save2copy' || $input->get('task') == 'copy') {
-
-        }
+		// Alter the title for save as copy
+		if ($app->input->get('task') == 'save2copy')
+		{
+			list($title, $alias) = $this->generateNewTitle($data['catid'], $data['alias'], $data['title']);
+			$data['title'] = $title;
+			$data['alias'] = $alias;
+			$data['published'] = 0;
+		}
 
         return parent::save($data);
     }
+
+    /**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $category_id  The id of the parent.
+	 * @param   string   $alias        The alias.
+	 * @param   string   $title         The title.
+	 *
+	 * @return  array  Contains the modified title and alias.
+	 *
+	 * @since   3.1
+	 */
+	protected function generateNewTitle($category_id, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = $this->getTable();
+
+		while ($table->load(array('alias' => $alias, 'catid' => $category_id)))
+		{
+			if ($title == $table->title)
+			{
+				$title = StringHelper::increment($title);
+			}
+
+			$alias = StringHelper::increment($alias, 'dash');
+		}
+
+		return array($title, $alias);
+	}
 
     /**
      * Is the user allowed to create an on the fly category?
      *
      * @return  boolean
      *
-     * @since   3.6.1
+     *  @since   __BUMP_VERSION__
+     * 
      */
     private function canCreateCategory()
     {
-        return $this->getCurrentUser()->authorise('core.create', 'com_tswrent');
+        return Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tswrent');
     }
 }

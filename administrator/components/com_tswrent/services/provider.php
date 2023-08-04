@@ -1,14 +1,15 @@
 <?php
-
 /**
- * @package     tswrent
+ * @package     Joomla.Administrator
+ * @subpackage  com_tswrent
  *
- * @copyright   (C)
- * @license     GNU General Public License version 3 or later
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-defined('_JEXEC') or die;
-
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\Categories\CategoryFactoryInterface;
 use Joomla\CMS\Component\Router\RouterFactoryInterface;
@@ -28,9 +29,10 @@ use Joomla\DI\ServiceProviderInterface;
 /**
  * The banners service provider.
  *
- * @since  4.0.0
+ * @since__BUMP_VERSION__
  */
 return new class () implements ServiceProviderInterface {
+    
     /**
      * Registers the service provider with a DI container.
      *
@@ -38,7 +40,7 @@ return new class () implements ServiceProviderInterface {
      *
      * @return  void
      *
-     * @since   4.0.0
+     * @since   __BUMP_VERSION__
      */
     public function register(Container $container)
     {

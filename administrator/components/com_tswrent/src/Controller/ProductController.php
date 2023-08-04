@@ -9,14 +9,15 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Controller;
 
-\defined('_JEXEC') or die;
-
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\Router\Route;
 
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Controller for a single product
+ * Product ontroller class 
  *
  * @since  __BUMP_VERSION__
  */

@@ -1,65 +1,42 @@
 <?php
-
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
  *
- * @copyright   (C) 2008 Open Source Matters, Inc. <https://www.joomla.org>
+ * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace TSWEB\Component\Tswrent\Administrator\View\Products;
 
-
+use Exception;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Toolbar\Button\DropdownButton;
+use Joomla\CMS\Pagination\Pagination;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use TSWEB\Component\Tswrent\Administrator\Model\ProductsModel;
 
 // phpcs:disable PSR1.Files.SideEffects
-defined('_JEXEC') or die;
+\defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
  * View class for a list of products.
  *
- * @since  1.6
+ * @since  __BUMP_VERSION__
  */
 class HtmlView extends BaseHtmlView
 {
     /**
-     * An array of items
-     *
-     * @var    array
-     * @since  1.6
-     */
-    protected $items;
-
-    /**
-     * The pagination object
-     *
-     * @var    Pagination
-     * @since  1.6
-     */
-    protected $pagination;
-
-    /**
-     * The model state
-     *
-     * @var    Registry
-     * @since  1.6
-     */
-    protected $state;
-    
-    /**
      * The search tools form
      *
      * @var    Form
-     * @since  1.6
+     * @since  __BUMP_VERSION__
      */
     public $filterForm;
 
@@ -67,11 +44,35 @@ class HtmlView extends BaseHtmlView
      * The active search filters
      *
      * @var    array
-     * @since  1.6
+     * @since  __BUMP_VERSION__
      */
-     public $activeFilters;
-    
-     /**
+    public $activeFilters = [];
+
+    /**
+     * An array of items
+     *
+     * @var    array
+     * @since  __BUMP_VERSION__
+     */
+    protected $items = [];
+
+    /**
+     * The pagination object
+     *
+     * @var    Pagination
+     * @since  __BUMP_VERSION__
+     */
+    protected $pagination;
+
+    /**
+     * The model state
+     *
+     * @var    CMSObject
+     * @since  __BUMP_VERSION__
+     */
+    protected $state;
+
+    /**
      * Is this view an Empty State
      *
      * @var  boolean
@@ -80,23 +81,25 @@ class HtmlView extends BaseHtmlView
     private $isEmptyState = false;
 
     /**
-     * Method to display the view.
+     * Display the view
      *
-     * @param   string  $tpl  A template file to load. [optional]
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   __BUMP_VERSION__
+     *
      * @throws  Exception
      */
-    public function display($tpl = null)
+    public function display($tpl = null): void
     {
-        $this->items         = $this->get('Items');
-        $this->pagination    = $this->get('Pagination');
-        $this->state         = $this->get('State');
-        $this->filterForm    = $this->get('FilterForm');
-        $this->activeFilters = $this->get('ActiveFilters');
-    
+        /** @var ProductsModel $model */
+        $model               = $this->getModel();
+        $this->items         = $model->getItems();
+        $this->pagination    = $model->getPagination();
+        $this->state         = $model->getState();
+        $this->filterForm    = $model->getFilterForm();
+        $this->activeFilters = $model->getActiveFilters();
 
         if (!\count($this->items) && $this->isEmptyState = $this->get('IsEmptyState')) {
             $this->setLayout('emptystate');
@@ -107,12 +110,7 @@ class HtmlView extends BaseHtmlView
             throw new GenericDataException(implode("\n", $errors), 500);
         }
 
-        // We don't need toolbar in the modal window.
-        if ($this->getLayout() !== 'modal') {
-            $this->addToolbar();
-        } else {
-            }
-
+        $this->addToolbar();
 
         parent::display($tpl);
     }
@@ -122,7 +120,8 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   __BUMP_VERSION__
+     * 
      */
     protected function addToolbar(): void
     {
