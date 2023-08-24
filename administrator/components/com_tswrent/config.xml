@@ -1,5 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
+	<fieldset 		name="factory-details"
+					label="COM_TSWRENT_FIELDSET_FACTORY_DETAILS"
+					>
+		<field 
+			name="factory_name"
+			type="textarea"
+			label="COM_TSWRENT_FIELD_NAME"
+		/>
+		<fields	name="address_details">		
+				<fieldset>
+					<field 
+						name="address" 
+						type="text" 		
+						label="COM_TSWRENT_FIELD_ADDRESS" 
+					/>
+					<field 
+						name="city" 
+						type="text"			
+						label="COM_TSWRENT_FIELD_CITY" 
+					/>
+					<field 
+						name="postalcode" 
+						type="text"	
+						default='0000'		
+						label="COM_TSWRENT_FIELD_POSTALCODE" 
+					/>
+				</fieldset>
+		</fields>
+		<field 
+			name="telephone" 
+			type="text" 	
+			label="COM_TSWRENT_FIELD_TELEPHONE" 
+		/>
+		<field 
+			name="mobile" 
+			type="text" 
+			label="COM_TSWRENT_FIELD_MOBILE" 
+		/>	
+		<field 
+			name="webpage" 
+			type="url" 
+			default="http://www.example.com" 
+			label="COM_TSWRENT_FIELD_WEBPAGE" 
+			size="10" 
+		/>
+
+		<fields	name="bank-connection">
+			<fieldset>
+				<field 
+					name="bankname" 
+					type="text" 
+					default='Name of the Bank'		
+					label="COM_TSWRENT_FIELD_BANKNAME" 
+				/>
+				<field 
+					name="account-owner" 
+					type="text"	
+					default='Name of the Account Owner'		
+					label="COM_TSWRENT_FIELD_ACCOUNT_OWNER" 
+				/>
+				<field 
+					name="iban" 
+					type="text"	
+					default='CH0000'		
+					label="COM_TSWRENT_FIELD_IBAN" 
+				/>
+			</fieldset>
+		</fields>		
+	</fieldset>
 	<fieldset
 		name="permissions"
 		label="JCONFIG_PERMISSIONS_LABEL"

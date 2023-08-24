@@ -78,14 +78,30 @@
 				alt="Tswrent/Supplyers"
 				>
 				COM_TSWRENT_SUPPLIERS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=customers"
+				view="customers"
+				img="class:tswrent-customers"
+				alt="Tswrent/Customers"
+				>
+				COM_TSWRENT_CUSTOMERS
 			</menu>	
 			<menu
-				link="option=com_tswrent&amp;view=supplieremployees"
-				view="supplyers_employees"
-				img="class:tswrent-supplyer_employees"
-				alt="Tswrent/Supplyer/Employees"
+				link="option=com_tswrent&amp;view=contacts"
+				view="contacts"
+				img="class:tswrent-contacts"
+				alt="Tswrent/Contacts"
 				>
-				COM_TSWRENT_SUPPLIEREMPLOYEES
+				COM_TSWRENT_CONTACTS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=config&amp;layout=edit";
+				view="config"
+				img="class:tswrent-config"
+				alt="Tswrent/Config"
+				>
+				COM_TSWRENT_CONFIG
 			</menu>
 		</submenu>
 		

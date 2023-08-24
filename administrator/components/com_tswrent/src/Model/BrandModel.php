@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
+use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -115,6 +116,31 @@ class BrandModel extends AdminModel
         return $form;
     }
 
+  /**
+     * Overloads the parent getItem() method.
+     *
+     * @param   integer  $pk  Primary key
+     *
+     * @return  object|boolean  Object on success, false on failure
+     *
+     * @since  __BUMP_VERSION__
+     * @throws \Exception
+     */
+
+    
+    public function getItem($pk = null){
+        
+        $item = parent::getItem($pk);
+        
+        if (!empty($item->id)) {
+            $id=$item->id;
+            $item->supplier_ids= TswrentHelper::getInputSupplierBrandRelation($id,'brandsupplier');
+            $item->product_ids= $this->getProducts($id);
+           /** $item->users= TswrentHelper::getContacts($supplier_id, 'Supplier');**/
+        }
+
+        return $item;
+    }
 
     /**
      * Method to get the data that should be injected in the form.
@@ -182,5 +208,51 @@ class BrandModel extends AdminModel
 
         // Increment the content version number.
         $table->version++;
+    }
+        /**
+     * Method to save the form data.
+     *
+     * @param   array  $data  The form data.
+     *
+     * @return  boolean  True on success.
+     *
+     *  @since   __BUMP_VERSION__
+     * 
+     */
+    public function save($data)
+    {
+        $id=$data['id'];
+        $related_ids=$data['supplier_ids'];
+
+
+        if (!empty($id)||!empty($related_ids) ) {
+
+            foreach( $related_ids as $k => $v){
+                $related_id[]= $v['supplier_id'];
+            }
+            $related_id= array_unique($related_id);
+            $related_id= array_diff($related_id,['0']);
+            if(!empty($related_id)){
+            TswrentHelper::saveSupplierBrandRelation($id,$related_id,'brandsupplier');
+            }
+        }
+        return parent::save($data);
+    }
+
+    public function getProducts($id)
+    {
+		$db    = $this->getDatabase();
+        $query = $db->getQuery(true);
+
+        // Select the required fields from the table.
+        $query->select('a.*')
+		->from($db->quoteName('#__tswrent_products', 'a'))
+        ->where('a.published =  "1"')
+        ->where('a.brand_id ='.$id);
+       
+        $db->setQuery($query);
+		$input = $db->loadObjectList();
+
+        return ($input);
     }
 }

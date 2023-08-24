@@ -25,10 +25,10 @@
 			label="COM_TSWRENT_FIELD_DESCRIPTION"
 		/>
 		<field 
-			name="website" 
+			name="webpage" 
 			type="url" 
 			default="http://www.example.com" 
-			label="COM_TSWRENT_FIELD_WEBSITE" 
+			label="COM_TSWRENT_FIELD_WEBPAGE" 
 			size="10" 
 		/>
 		<field
@@ -43,18 +43,31 @@
 			<option value="0">JUNPUBLISHED</option>
 			<option value="2">JARCHIVED</option>
 			<option value="-2">JTRASHED</option>
-		</field>
+		</field>		
+	</fieldset>
 
-		<field 
-			name="supplier_id" 
-			type="suppliers"
-			label="COM_TSWRENT_SUPPLIERS"
-			multiselect= "true"	
-		/>
+	<fieldset name="supplier">
+		<field
+				name="supplier_ids"
+				type="subform"
+				label="COM_TSWRENT_FIELD_SUPPLIER"
+				default=""
+				multiple="true"
+				layout="joomla.form.field.subform.repeatable"
+				>
+				<form>
+					<fieldset>
+						<field 
+						name="supplier_id" 
+						type="supplier"
+						validate="options"	
+						/>
+					</fieldset>
+				</form>
+			</field>
 	</fieldset>
 
 	<fieldset name="publish">
-
 		<field 
 			name="id" 
 			type="text"
@@ -62,15 +75,13 @@
 			readonly="true"
 			class="readonly"
 			label="JGLOBAL_FIELD_ID_LABEL"
-		/>
-		
+		/>	
 		<field
 			name="created_by"
 			type="user"
 			label="JGLOBAL_FIELD_CREATED_BY_LABEL"
 			validate="UserId"
 		/>
-
 		<field
 			name="created_by_alias"
 			type="text"

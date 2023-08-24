@@ -35,7 +35,7 @@ $wa->useScript('keepalive')
 <form action="<?php echo Route::_('index.php?option=com_tswrent&layout=' . $layout . $tmpl . '&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="supplier-form" class="form-validate">
 
 	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
-	<div>
+    <div class="main-card">
 		<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'details']); ?>
 
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'details', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_DETAIL') : Text::_('COM_TSWRENT_FIELDSET_DETAIL')); ?>
@@ -45,6 +45,32 @@ $wa->useScript('keepalive')
 							<legend><?php echo Text::_('COM_TSWRENT_FIELDSET_DETAIL'); ?></legend>
 							<div>
 								<?php echo $this->form->renderFieldset('details'); ?>
+							</div>
+						</fieldset>
+					</div>
+				</div>	
+			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'brand', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_BRAND') : Text::_('COM_TSWRENT_FIELDSET_BRAND')); ?>
+				<div class="row">
+					<div class="col-md-12">
+						<fieldset id="fieldset-branddata" class="options-form">
+							<legend><?php echo Text::_('COM_TSWRENT_FIELDSET_BRAND'); ?></legend>
+							<div>
+								<?php echo $this->form->renderFieldset('brand'); ?>
+							</div>
+						</fieldset>
+					</div>
+				</div>	
+			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'contact', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_CONTACT') : Text::_('COM_TSWRENT_FIELDSET_CONTACT')); ?>
+				<div class="row">
+					<div class="col-md-12">
+						<fieldset id="fieldset-contactdata" class="options-form">
+							<legend><?php echo Text::_('COM_TSWRENT_FIELDSET_CONTACT'); ?></legend>
+							<div>
+								<?php echo $this->form->renderFieldset('contact'); ?>
 							</div>
 						</fieldset>
 					</div>

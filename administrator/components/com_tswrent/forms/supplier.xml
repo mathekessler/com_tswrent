@@ -51,10 +51,10 @@
 			label="COM_TSWRENT_FIELD_MOBILE" 
 		/>
 		<field 
-			name="website" 
+			name="webpage" 
 			type="url" 
 			default="http://www.example.com" 
-			label="COM_TSWRENT_FIELD_WEBSITE" 
+			label="COM_TSWRENT_FIELD_WEBPAGE" 
 			size="10" 
 		/>
 		<field 
@@ -64,18 +64,8 @@
 			size="30"
 			class="inputbox"
 			validate="email" />
-
-		<field 
-			name="brand_id" 
-			type="brand"
-			label="COM_TSWRENT_FIELD_BRAND"
-			validate="options"
-			multiple="true"
 			
-		/>
-		
-
-		<field
+			<field
 			name="published"
 			type="list"
 			label="JSTATUS"
@@ -88,18 +78,49 @@
 			<option value="2">JARCHIVED</option>
 			<option value="-2">JTRASHED</option>
 		</field>
-
 	</fieldset>
 
-	<fieldset name="employees">
-			
-		<field 
-			name="supplier_employee_id" 
-			type="supplier_employee"
-			label="COM_TSWRENT_FIELD_SUPPLIER_EMPLOYEE"
-			multiselect= "true"	
-		/>
+	<fieldset name="brand">
+		<field
+			name="brand_ids"
+			type="subform"
+			label="COM_TSWRENT_FIELD_BRAND"
+			default=""
+			multiple="true"
+			layout="joomla.form.field.subform.repeatable-table"
+			>
+			<form>
+				<fieldset>
+					<field 
+					name="brand_id" 
+					type="brand"
+					hint="JFIELD_ALIAS_PLACEHOLDER"
+					validate="options"	
+					/>
+				</fieldset>
+			</form>
+		</field>
+	</fieldset>
 
+	<fieldset name='contact'>
+		<field
+			name="contact_ids"
+			type="subform"
+			label="COM_TSWRENT_FIELD_CONTACTS"
+			default=""
+			multiple="true"
+			layout="joomla.form.field.subform.repeatable-table"
+			>
+			<form>
+				<fieldset>
+					<field 
+					name="contact_id" 
+					type="contact"
+					validate="options"	
+					/>
+				</fieldset>
+			</form>
+		</field>	
 	</fieldset>
 
 	<fieldset name="publish">

@@ -22,7 +22,6 @@ $user       = Factory::getUser();
 $userId     = $user->get('id');
 $listOrder  = $this->escape($this->state->get('list.ordering'));
 $listDirn   = $this->escape($this->state->get('list.direction'));
-$saveOrder = $listOrder == 'a.ordering';
 
 ?>    
 <form action="<?php echo Route::_('index.php?option=com_tswrent&view=suppliers'); ?>" method="post" name="adminForm" id="adminForm">
@@ -66,7 +65,7 @@ $saveOrder = $listOrder == 'a.ordering';
                                     <span ><?php echo Text::_('COM_TSWRENT_HEADING_MAIL'); ?></span>
                                 </th>
                                 <th scope="col" class="w-5 d-none d-md-table-cell">
-                                    <span ><?php echo Text::_('COM_TSWRENT_HEADING_WEBSITE'); ?></span>
+                                    <span ><?php echo Text::_('COM_TSWRENT_HEADING_WEBPAGE'); ?></span>
                                 </th>
                                 <th scope="col" class="w-3 text-center d-none d-md-table-cell">
                                     <span class="icon-check" aria-hidden="true" title="<?php echo Text::_('COM_TSWREN_COUNT_PUBLISHED_ITEMS'); ?>"></span>
@@ -91,11 +90,11 @@ $saveOrder = $listOrder == 'a.ordering';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($this->items as $i => $item) :
-                                $canCreate  = $user->authorise('core.create','com_tswrent');
-                                $canEdit    = $user->authorise('core.edit', 'com_tswrent');
+                        <?php foreach ($this->items as $i => $item) :
+                                $canCreate  = $user->authorise('core.create');
+                                $canEdit    = $user->authorise('core.edit');
                                 $canCheckin = $user->authorise('core.manage', 'com_checkin') || $item->checked_out == $userId || is_null($item->checked_out);
-                                $canChange  = $user->authorise('core.edit.state', 'com_tswrent') && $canCheckin;
+                                $canChange  = $user->authorise('core.edit.state') && $canCheckin;
                                 ?>
                                  <tr class="row<?php echo $i % 2; ?>">
                                     <td class="text-center">
@@ -110,7 +109,7 @@ $saveOrder = $listOrder == 'a.ordering';
                                                 <?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'suppliers.', $canCheckin); ?>
                                             <?php endif; ?>
                                             <?php if ($canEdit) : ?>
-                                                <a href="<?php echo Route::_('index.php?option=com_tswrent&task=supplier.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($item->title); ?>">
+                                                <a href="<?php echo Route::_('index.php?option=com_tswrent&view=supplier&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($item->title); ?>">
                                                     <?php echo $this->escape($item->title); ?></a>
                                             <?php else : ?>
                                                 <?php echo $this->escape($item->title); ?>
@@ -127,7 +126,7 @@ $saveOrder = $listOrder == 'a.ordering';
                                         <?php echo $item->mail_to; ?>
                                     </td>
                                     <td class="small d-none d-md-table-cell">
-                                    <a href="<?php echo $item->website; ?>"><?php echo $item->website; ?></a>
+                                    <a href="<?php echo $item->webpage; ?>"><?php echo $item->webpage; ?></a>
                                     </td>
                                     </td>
                                     <td class="text-center btns d-none d-md-table-cell itemnumber">

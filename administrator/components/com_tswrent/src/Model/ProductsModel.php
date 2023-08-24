@@ -9,7 +9,6 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 

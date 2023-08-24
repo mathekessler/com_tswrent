@@ -18,11 +18,15 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 
-$user       = Factory::getUser();
-$userId     = $user->get('id');
-$listOrder  = $this->escape($this->state->get('list.ordering'));
-$listDirn   = $this->escape($this->state->get('list.direction'));
-$saveOrder = $listOrder == 'a.ordering';
+/** @var \Joomla\CMS\WebAsset\WebAssetManager $wa */
+$wa = $this->document->getWebAssetManager();
+$wa->useScript('table.columns')
+    ->useScript('multiselect');
+
+$user      = Factory::getUser();
+$userId    = $user->get('id');
+$listOrder = $this->escape($this->state->get('list.ordering'));
+$listDirn  = $this->escape($this->state->get('list.direction'));
 
 ?>    
 <form action="<?php echo Route::_('index.php?option=com_tswrent&view=brands'); ?>" method="post" name="adminForm" id="adminForm">
@@ -39,7 +43,7 @@ $saveOrder = $listOrder == 'a.ordering';
                         <?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
                     </div>
                 <?php else : ?>
-                    <table class="table">
+                    <table class="table" id="brandList">
                         <caption class="visually-hidden">
                             <?php echo Text::_('COM_TSWRENT_BRANDS_TABLE_CAPTION'); ?>,
                             <span id="orderedBy"><?php echo Text::_('JGLOBAL_SORTED_BY'); ?> </span>,
@@ -57,25 +61,14 @@ $saveOrder = $listOrder == 'a.ordering';
                                     <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_TITLE', 'a.title', $listDirn, $listOrder); ?>
                                 </th>
                                 <th scope="col" class="w-5 d-none d-md-table-cell">
-                                    <span ><?php echo Text::_('COM_TSWRENT_HEADING_WEBSITE'); ?></span>
+                                    <span ><?php echo Text::_('COM_TSWRENT_HEADING_WEBPAGE'); ?></span>
                                 </th>
                                 <th scope="col" class="w-3 text-center d-none d-md-table-cell">
-                                    <span class="icon-check" aria-hidden="true" title="<?php echo Text::_('COM_TSWREN_COUNT_PUBLISHED_ITEMS'); ?>"></span>
-                                    <span class="visually-hidden"><?php echo Text::_('COM_TSWRENTt_COUNT_PUBLISHED_ITEMS'); ?></span>
+                                    <span  title="<?php echo Text::_('COM_TSWREN_PRODUCTS'); ?>"><?php echo Text::_('COM_TSWREN_PRODUCTS'); ?></span>
                                 </th>
                                 <th scope="col" class="w-3 text-center d-none d-md-table-cell">
-                                    <span class="icon-times" aria-hidden="true" title="<?php echo Text::_('COM_TSWREN_COUNT_UNPUBLISHED_ITEMS'); ?>"></span>
-                                    <span class="visually-hidden"><?php echo Text::_('COM_TSWREN_COUNT_UNPUBLISHED_ITEMS'); ?></span>
+                                    <span  title="<?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?>"><?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?></span>
                                 </th>
-                                <th scope="col" class="w-3 text-center d-none d-md-table-cell">
-                                    <span class="icon-folder icon-fw" aria-hidden="true" title="<?php echo Text::_('COM_TSWREN_COUNT_ARCHIVED_ITEMS'); ?>"></span>
-                                    <span class="visually-hidden"><?php echo Text::_('COM_TSWREN_COUNT_ARCHIVED_ITEMS'); ?></span>
-                                </th>
-                                <th scope="col" class="w-3 text-center d-none d-md-table-cell">
-                                    <span class="icon-trash" aria-hidden="true" title="<?php echo Text::_('COM_TSWREN_COUNT_TRASHED_ITEMS'); ?>"></span>
-                                    <span class="visually-hidden"><?php echo Text::_('COM_TSWREN_COUNT_TRASHED_ITEMS'); ?></span>
-                                </th>
-
                                 <th scope="col" class="w-5 d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
                                 </th>
@@ -101,7 +94,7 @@ $saveOrder = $listOrder == 'a.ordering';
                                                 <?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'brands.', $canCheckin); ?>
                                             <?php endif; ?>
                                             <?php if ($canEdit) : ?>
-                                                <a href="<?php echo Route::_('index.php?option=com_tswrent&task=brand.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($item->title); ?>">
+                                                <a href="<?php echo Route::_('index.php?option=com_tswrent&view=brand&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($item->title); ?>">
                                                     <?php echo $this->escape($item->title); ?></a>
                                             <?php else : ?>
                                                 <?php echo $this->escape($item->title); ?>
@@ -109,44 +102,20 @@ $saveOrder = $listOrder == 'a.ordering';
                                         </div>
                                     </th>
                                     <td class="small d-none d-md-table-cell">
-                                    <a href="<?php echo $item->website; ?>"><?php echo $item->website; ?></a>
+                                    <a href="<?php echo $item->webpage; ?>"><?php echo $item->webpage; ?></a>
                                     </td>
                                     </td>
                                     <td class="text-center btns d-none d-md-table-cell itemnumber">
-                                        <a class="btn <?php echo ($item->count_published > 0) ? 'btn-success' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=products&filter[brand_id]=' . (int) $item->id . '&filter[published]=1'); ?>"
+                                        <a class="btn <?php echo ($item->count_products > 0) ? 'btn-success' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=products&filter[brand_id]=' . (int) $item->id  ); ?>"
                                         aria-describedby="tip-publish<?php echo $i; ?>">
-                                            <?php echo $item->count_published; ?>
+                                            <?php echo $item->count_products; ?>
                                         </a>
-                                        <div role="tooltip" id="tip-publish<?php echo $i; ?>">
-                                            <?php echo Text::_('COM_TSWRENT_COUNT_PUBLISHED_ITEMS'); ?>
-                                        </div>
                                     </td>
                                     <td class="text-center btns d-none d-md-table-cell itemnumber">
-                                        <a class="btn <?php echo ($item->count_unpublished > 0) ? 'btn-danger' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=products&filter[brand_id]=' . (int) $item->id . '&filter[published]=0'); ?>"
-                                        aria-describedby="tip-unpublish<?php echo $i; ?>">
-                                            <?php echo $item->count_unpublished; ?>
+                                        <a class="btn <?php echo ($item->count_suppliers > 0) ? 'btn-success' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=suppliers&filter[brand_id]=' . (int) $item->id ); ?>"
+                                        aria-describedby="tip-publish<?php echo $i;?>">
+                                            <?php echo $item->count_suppliers;?>
                                         </a>
-                                        <div role="tooltip" id="tip-unpublish<?php echo $i; ?>">
-                                            <?php echo Text::_('COM_TSWRENT_COUNT_UNPUBLISHED_ITEMS'); ?>
-                                        </div>
-                                    </td>
-                                    <td class="text-center btns d-none d-md-table-cell itemnumber">
-                                        <a class="btn <?php echo ($item->count_archived > 0) ? 'btn-info' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=products&filter[brand_id]=' . (int) $item->id . '&filter[published]=2'); ?>"
-                                        aria-describedby="tip-archived<?php echo $i; ?>">
-                                            <?php echo $item->count_archived; ?>
-                                        </a>
-                                        <div role="tooltip" id="tip-archived<?php echo $i; ?>">
-                                            <?php echo Text::_('COM_TSWRENT_COUNT_ARCHIVED_ITEMS'); ?>
-                                        </div>
-                                    </td>
-                                    <td class="text-center btns d-none d-md-table-cell itemnumber">
-                                        <a class="btn <?php echo ($item->count_trashed > 0) ? 'btn-dark' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=products&filter[brand_id]=' . (int) $item->id . '&filter[published]=-2'); ?>"
-                                        aria-describedby="tip-trashed<?php echo $i; ?>">
-                                            <?php echo $item->count_trashed; ?>
-                                        </a>
-                                        <div role="tooltip" id="tip-trashed<?php echo $i; ?>">
-                                            <?php echo Text::_('COM_TSWRENT_COUNT_TRASHED_ITEMS'); ?>
-                                        </div>
                                     </td>
 
                                     <td class="d-none d-md-table-cell">

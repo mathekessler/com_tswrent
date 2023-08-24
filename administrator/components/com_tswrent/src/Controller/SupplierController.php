@@ -31,4 +31,75 @@ class SupplierController extends FormController
      */
     protected $text_prefix = 'COM_TSWRENT_SUPPLIER';
 
+
+    	/**
+	 * Method to edit supplier.
+	 *
+	 * @return  void
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function edit2()
+	{
+        $id    = $this->input->get('id');
+
+        $this->setRedirect('index.php?option=com_tswrent&task=supplier.edit&id='.$id);
+    }
+
+    
+    	/**
+	 * Method to remove brand.
+	 *
+	 * @return  void
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function removebrand()
+	{     
+		// Get the model.
+		$model  = $this->getModel();
+		$id    = $this->input->get('id' , 'int');
+		$brand_id    = $this->input->get('brand_id' , 'int');
+		
+		if (!$this->app->getIdentity()->authorise('core.edit.state', 'com_contact.category.' . (int) $item->catid)) {
+			// Prune items that you can't change.
+			unset($id,$brand_id);
+			$this->app->enqueueMessage(Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'notice');
+		}
+
+		// Publish the items.
+		if (!$model->removebrand($id,$brand_id)) {
+			$this->app->enqueueMessage($model->getError(), 'warning');
+	}
+    
+        $this->setRedirect('index.php?option=com_tswrent&view=supplier&id='.$id);
+    }
+
+	    	/**
+	 * Method to remove brand.
+	 *
+	 * @return  void
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function removecontact()
+	{     
+		// Get the model.
+		$model  = $this->getModel();
+		$id    = $this->input->get('id' , 'int');
+		$contact_id    = $this->input->get('contact_id' , 'int');
+		
+		if (!$this->app->getIdentity()->authorise('core.edit.state', 'com_contact.category.' . (int) $item->catid)) {
+			// Prune items that you can't change.
+			unset($id,$contact_id);
+			$this->app->enqueueMessage(Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'), 'notice');
+		}
+
+		// Publish the items.
+		if (!$model->removecontact($id,$contact_id)) {
+			$this->app->enqueueMessage($model->getError(), 'warning');
+	}
+    
+        $this->setRedirect('index.php?option=com_tswrent&view=supplier&id='.$id);
+    }
 }

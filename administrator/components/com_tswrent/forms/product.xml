@@ -40,8 +40,8 @@
 			type="brand"
 			label="COM_TSWRENT_BRAND"
 			validate="options"
-			
-		/>
+			hint="JOPTION_SELECT">	
+		</field>
 		<field 
 			name="price"
 			type="number"
@@ -63,7 +63,7 @@
 		<field
 			name="consumable"
 			type="checkbox"
-			label="COM_TSWRENT_CONSUMABLE"
+			label="COM_TSWRENT_FIELD_CONSUMABLE"
 		/>
 
 		<field 

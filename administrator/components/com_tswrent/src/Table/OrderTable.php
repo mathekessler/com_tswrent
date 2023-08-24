@@ -22,7 +22,7 @@ use Joomla\Registry\Registry;
  *
  * @since  __BUMP_VERSION__
  */
-class FooTable extends Table
+class OrderTable extends Table
 {
 	/**
 	 * Constructor
@@ -97,7 +97,7 @@ class FooTable extends Table
 	}
 
 	/**
-	 * Stores a foo.
+	 * Stores a order.
 	 *
 	 * @param   boolean  $updateNulls  True to update fields even if they are null.
 	 *

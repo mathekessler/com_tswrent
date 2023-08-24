@@ -9,9 +9,9 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
-use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
+use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -35,13 +35,14 @@ class BrandsModel extends ListModel
 	 * @since   __BUMP_VERSION__
 	 * 
 	 */
-	public function __construct($config = array(), MVCFactoryInterface $factory = null)
+	public function __construct($config = [])
 	{
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
 				'id', 'a.id',
-				'title', 'a.title',
-                'website', 'a.website',
+				'title', 'a.title', 'name',
+                'webpage', 'a.webpage',
+				'supplier', 'a.supplier','supplier_id',
 				'published', 'a.published',
 			);
 		}
@@ -88,7 +89,7 @@ class BrandsModel extends ListModel
 			$this->getState(
 				'list.select',
 						'a.id, a.title,'.
-						'a.published, a.website'
+						'a.published, a.webpage'
 					)
 				)
 			
@@ -168,72 +169,41 @@ class BrandsModel extends ListModel
         // Getting the following metric by joins is WAY TOO SLOW.
         // Faster to do three queries for very large banner trees.
 
-        // Get the brands in the list.
+        // Get the clients in the list.
         $db        = $this->getDatabase();
         $brandIds = array_column($items, 'id');
 
-        $query = $db->getQuery(true)
+        
+		$query = $db->getQuery(true)
             ->select(
                 [
                     $db->quoteName('brand_id'),
-                    'COUNT(' . $db->quoteName('brand_id') . ') AS ' . $db->quoteName('count_published'),
+                    'COUNT(' . $db->quoteName('brand_id') . ') AS ' . $db->quoteName('count_products'),
                 ]
             )
             ->from($db->quoteName('#__tswrent_products'))
-            ->where($db->quoteName('published') . ' = :published')
             ->whereIn($db->quoteName('brand_id'), $brandIds)
-            ->group($db->quoteName('brand_id'))
-            ->bind(':published', $published, ParameterType::INTEGER); 
+            ->group($db->quoteName('brand_id'));
 
         $db->setQuery($query);
 
-        // Get the published banners count.
+        // Get the published Products count.
         try {
-            $published          = 1;
-            $countPublished = $db->loadAssocList('brand_id', 'count_published');
+            $countProducts = $db->loadAssocList('brand_id', 'count_products');
         } catch (\RuntimeException $e) {
             $this->setError($e->getMessage());
 
             return false;
         }
 
-        // Get the unpublished banners count.
-        try {
-            $published            = 0;
-            $countUnpublished = $db->loadAssocList('supplier_id', 'count_published');
-        } catch (\RuntimeException $e) {
-            $this->setError($e->getMessage());
-
-            return false;
-        }
-
-        // Get the trashed banners count.
-        try {
-            $published        = -2;
-            $countTrashed = $db->loadAssocList('supplier_id', 'count_published');
-        } catch (\RuntimeException $e) {
-            $this->setError($e->getMessage());
-
-            return false;
-        }
-
-        // Get the archived banners count.
-        try {
-            $published         = 2;
-            $countArchived = $db->loadAssocList('supplier_id', 'count_published');
-        } catch (\RuntimeException $e) {
-            $this->setError($e->getMessage());
-
-            return false;
-        }
+		$countSuppliers = $this->countSupplier($brandIds);
 
         // Inject the values back into the array.
         foreach ($items as $item) {
-            $item->count_published   = isset($countPublished[$item->id]) ? $countPublished[$item->id] : 0;
-            $item->count_unpublished = isset($countUnpublished[$item->id]) ? $countUnpublished[$item->id] : 0;
-            $item->count_trashed     = isset($countTrashed[$item->id]) ? $countTrashed[$item->id] : 0;
-            $item->count_archived    = isset($countArchived[$item->id]) ? $countArchived[$item->id] : 0;
-        }
+            $item->count_products    = isset($countProducts[$item->id]) ? $countProducts[$item->id] : 0;
+            $item->count_suppliers =   isset($countSuppliers[$item->id]) ? $countSuppliers[$item->id] : 0;
+			
+		}
 
         // Add the items to the internal cache.
         $this->cache[$store] = $items;
@@ -259,5 +229,34 @@ class BrandsModel extends ListModel
 		// List state information.
 		parent::populateState($ordering, $direction);
 
+	}
+
+	protected function countSupplier($brandIds)
+	{
+		$db        = $this->getDatabase();
+		$query = $db->getQuery(true)
+		->select(
+			[
+				$db->quoteName('brand_id'),
+				'COUNT(' . $db->quoteName('brand_id') . ') AS ' . $db->quoteName('count_published'),
+			]
+		)
+		->from($db->quoteName('#__tswrent_brand_supplier_relation'))
+		->whereIn($db->quoteName('brand_id'), $brandIds)
+		->group($db->quoteName('brand_id'));
+
+	$db->setQuery($query);
+
+	// Get the published banners count.
+	try {
+		$state          = 1;
+		$countPublished = $db->loadAssocList('brand_id', 'count_published');
+	} catch (\RuntimeException $e) {
+		$this->setError($e->getMessage());
+
+		return false;
+	}
+
+		return ($countPublished);
 	}
 }

@@ -9,15 +9,21 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\View\Brands;
 
-\defined('_JEXEC') or die;
-
+use Exception;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Pagination\Pagination;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\View\GenericDataException;
+use TSWEB\Component\Tswrent\Administrator\Model\BrandsModel;
+
+// phpcs:disable PSR1.Files.SideEffects
+\defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
 /**
  * View class for a list of brands.
@@ -27,65 +33,84 @@ use Joomla\CMS\MVC\View\GenericDataException;
 class HtmlView extends BaseHtmlView
 {
 	/**
-	 * An array of items
-	 *
-	 * @var  array
-	 */
-	protected $items;
+     * The search tools form
+     *
+     * @var    Form
+     * @since  __BUMP_VERSION__
+     */
+    public $filterForm;
 
-	/**
-	 * The pagination object
-	 *
-	 * @var  \JPagination
-	 */
-	protected $pagination;
+    /**
+     * The active search filters
+     *
+     * @var    array
+     * @since  __BUMP_VERSION__
+     */
+    public $activeFilters = [];
 
-	/**
-	 * The model state
-	 *
-	 * @var  \JObject
-	 */
-	protected $state;
+    /**
+     * An array of items
+     *
+     * @var    array
+     * @since  __BUMP_VERSION__
+     */
+    protected $items = [];
 
-	/**
-	 * Form object for search filters
-	 *
-	 * @var  \JForm
-	 */
-	public $filterForm;
+    /**
+     * The pagination object
+     *
+     * @var    Pagination
+     * @since  __BUMP_VERSION__
+     */
+    protected $pagination;
 
-	/**
-	 * The active search filters
-	 *
-	 * @var  array
-	 */
-	public $activeFilters;
+    /**
+     * The model state
+     *
+     * @var    CMSObject
+     * @since  __BUMP_VERSION__
+     */
+    protected $state;
 
-	/**
-	 * Method to display the view.
-	 *
-	 * @param   string  $tpl  A template file to load. [optional]
-	 *
-	 * @return  void
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function display($tpl = null): void
-	{
-		$this->items = $this->get('Items');
+    /**
+     * Is this view an Empty State
+     *
+     * @var  boolean
+     * @since 4.0.0
+     */
+    private $isEmptyState = false;
 
-		$this->pagination = $this->get('Pagination');
+    /**
+     * Display the view
+     *
+     * @param   string  $tpl  The name of the template file to parse; automatically searches through the template paths.
+     *
+     * @return  void
+     *
+     * @since   __BUMP_VERSION__
+     *
+     * @throws  Exception
+     */
+    public function display($tpl = null): void
+    {
+        /** @var BrandsModel $model */
+        $model               = $this->getModel();
+        $this->items         = $model->getItems();
+        $this->pagination    = $model->getPagination();
+        $this->state         = $model->getState();
+        $this->filterForm    = $model->getFilterForm();
+        $this->activeFilters = $model->getActiveFilters();
 
-		$this->filterForm = $this->get('FilterForm');
-		$this->activeFilters = $this->get('ActiveFilters');
-		$this->state = $this->get('State');
+        if (!\count($this->items) && $this->isEmptyState = $this->get('IsEmptyState')) {
+            $this->setLayout('emptystate');
+        }
 
-		// Check for errors.
-		if (count($errors = $this->get('Errors'))) {
-			throw new GenericDataException(implode("\n", $errors), 500);
-		}
-
-		if (!count($this->items) && $this->get('IsEmptyState')) {
+        // Check for errors.
+        if (\count($errors = $this->get('Errors')) || $this->transitions === false) {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
+        
+        if (!count($this->items) && $this->get('IsEmptyState')) {
 			$this->setLayout('emptystate');
 		}
 
@@ -104,72 +129,70 @@ class HtmlView extends BaseHtmlView
 	 */
 	protected function addToolbar()
 	{
-		$this->sidebar = \JHtmlSidebar::render();
 
 		$canDo = ContentHelper::getActions('com_tswrent', 'category', $this->state->get('filter.category_id'));
-		$user  = Factory::getUser();
+		$user    = Factory::getApplication()->getIdentity();
+		$toolbar = Toolbar::getInstance();
 
-		// Get the toolbar object instance
-		$toolbar = Toolbar::getInstance('toolbar');
+		ToolbarHelper::title(Text::_('COM_TSWRENT_MANAGER_BRANDS'), 'address brands');
 
-		ToolbarHelper::title(Text::_('COM_TSWRENT_MANAGER_BRANDS'), 'address brand');
-
-		if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_tswrent', 'core.create')) > 0) {
+		if ($canDo->get('core.create') ) {
 			$toolbar->addNew('brand.add');
 		}
+		if (!$this->isEmptyState && ($canDo->get('core.edit.state') || ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')))) {
+            /** @var  DropdownButton $dropdown */
+            $dropdown = $toolbar->dropdownButton('status-group', 'JTOOLBAR_CHANGE_STATUS')
+                ->toggleSplit(false)
+                ->icon('icon-ellipsis-h')
+                ->buttonClass('btn btn-action')
+                ->listCheck(true);
 
-		if ($canDo->get('core.edit.state')) {
-			$dropdown = $toolbar->dropdownButton('status-group')
-				->text('JTOOLBAR_CHANGE_STATUS')
-				->toggleSplit(false)
-				->icon('fa fa-ellipsis-h')
-				->buttonClass('btn btn-action')
-				->listCheck(true);
-			$childBar = $dropdown->getChildToolbar();
-			$childBar->publish('brands.publish')->listCheck(true);
-			$childBar->unpublish('brands.unpublish')->listCheck(true);
+            $childBar = $dropdown->getChildToolbar();
 
-			$childBar->standardButton('featured')
-				->text('JFEATURE')
-				->task('brands.featured')
-				->listCheck(true);
-			$childBar->standardButton('unfeatured')
-				->text('JUNFEATURE')
-				->task('brands.unfeatured')
-				->listCheck(true);
+            if ($canDo->get('core.edit.state')) {
+                if ($this->state->get('filter.published') != 2) {
+                    $childBar->publish('brands.publish')->listCheck(true);
 
-			$childBar->archive('brands.archive')->listCheck(true);
+                    $childBar->unpublish('brands.unpublish')->listCheck(true);
+                }
 
-			if ($user->authorise('core.admin')) {
-				$childBar->checkin('brands.checkin')->listCheck(true);
-			}
+                if ($this->state->get('filter.published') != -1) {
+                    if ($this->state->get('filter.published') != 2) {
+                        $childBar->archive('brands.archive')->listCheck(true);
+                    } elseif ($this->state->get('filter.published') == 2) {
+                        $childBar->publish('publish')->task('brands.publish')->listCheck(true);
+                    }
+                }
 
-			if ($this->state->get('filter.published') != -2) {
-				$childBar->trash('brands.trash')->listCheck(true);
-			}
+                $childBar->checkin('brands.checkin');
 
-			if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')) {
-				$childBar->delete('brands.delete')
-					->text('JTOOLBAR_EMPTY_TRASH')
-					->message('JGLOBAL_CONFIRM_DELETE')
-					->listCheck(true);
-			}
+                if ($this->state->get('filter.published') != -2) {
+                    $childBar->trash('brands.trash')->listCheck(true);
+                }
+            }
 
-			// Add a batch button
-			if ($user->authorise('core.create', 'com_tswrent')
-				&& $user->authorise('core.edit', 'com_tswrent')
-				&& $user->authorise('core.edit.state', 'com_tswrent')) {
-				$childBar->popupButton('batch')
-					->text('JTOOLBAR_BATCH')
-					->selector('collapseModal')
-					->listCheck(true);
-			}
-		}
+            if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')) {
+                $toolbar->delete('brands.delete', 'JTOOLBAR_EMPTY_TRASH')
+                    ->message('JGLOBAL_CONFIRM_DELETE')
+                    ->listCheck(true);
+            }
 
-		if ($user->authorise('core.admin', 'com_tswrent') || $user->authorise('core.options', 'com_tswrent')) {
-			$toolbar->preferences('com_tswrent');
-		}
-		ToolbarHelper::divider();
-		ToolbarHelper::help('', false, 'http://example.org');
-	}
+            // Add a batch button
+            if (
+                $user->authorise('core.create', 'com_tswrent')
+                && $user->authorise('core.edit', 'com_tswrent')
+                && $user->authorise('core.edit.published', 'com_tswrent')
+            ) {
+                $childBar->popupButton('batch', 'JTOOLBAR_BATCH')
+                    ->selector('collapseModal')
+                    ->listCheck(true);
+            }
+        }
+
+        if ($user->authorise('core.admin', 'com_tswrent') || $user->authorise('core.options', 'com_tswrent')) {
+            $toolbar->preferences('com_tswrent');
+        }
+
+        $toolbar->help('Tswrent');
+    }
 }

@@ -44,7 +44,20 @@ $wa->useScript('keepalive')
 						<fieldset id="fieldset-detailsdata" class="options-form">
 							<legend><?php echo Text::_('COM_TSWRENT_FIELDSET_DETAIL'); ?></legend>
 							<div>
-								<?php echo $this->form->renderFieldset('details'); ?>
+								<?php echo $this->form->renderFieldset('details'); ?>								
+							</div>
+						</fieldset>
+					</div>
+				</div>	
+			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+			
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'supplier', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_SUPPLIER') : Text::_('COM_TSWRENT_FIELDSET_SUPPLIER')); ?>
+				<div class="row">
+					<div class="col-md-12">
+						<fieldset id="fieldset-supplierdata" class="options-form">
+							<legend><?php echo Text::_('COM_TSWRENT_FIELDSET_SUPPLIER'); ?></legend>
+							<div>
+								<?php echo $this->form->renderFieldset('supplier'); ?>								
 							</div>
 						</fieldset>
 					</div>

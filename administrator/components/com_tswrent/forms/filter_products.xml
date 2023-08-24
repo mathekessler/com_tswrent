@@ -14,6 +14,7 @@
 			name="published" 
 			type="status"
 			label="JOPTION_SELECT_PUBLISHED"
+			layout="joomla.form.field.list-fancy-select"
 			onchange="this.form.submit();"
 			>
 			<option value="">JOPTION_SELECT_PUBLISHED</option>
@@ -23,19 +24,22 @@
 		<field
 			name="category_id"
 			type="category"
-			label="JCATEGORY"
+			label="JOPTION_SELECT_CATEGORY"
 			extension="com_tswrent"
 			layout="joomla.form.field.list-fancy-select"
-			hint="JOPTION_SELECT_CATEGORY"
 			onchange="this.form.submit();"
 			published="0,1,2"
-		/>
+		>
+			<option value="">JOPTION_SELECT_CATEGORY</option>
+		</field>
 
 		<field
 			name="brand_id" 
 			type="brand"
 			label="COM_TSWRENT_BRAND"
+			layout="joomla.form.field.list-fancy-select"
 			validate="options"
+			onchange="this.form.submit();"
 			hint="JOPTION_SELECT"
 			>
 			<option value="">COM_TSWRENT_SELECTE_BRAND</option>
@@ -50,20 +54,21 @@
 			type="list"
 			label="JGLOBAL_SORT_BY"
 			onchange="this.form.submit();"
-			default="a.name ASC"
+			default="a.title ASC"
 			
 			>
 			<option value="">JGLOBAL_SORT_BY</option>
 			<option value="a.published ASC">JSTATUS_ASC</option>
 			<option value="a.published DESC">JSTATUS_DESC</option>
-			<option value="a.name ASC">JGLOBAL_TITLE_ASC</option>
-			<option value="a.name DESC">JGLOBAL_TITLE_DESC</option>
+			<option value="a.title ASC">JGLOBAL_TITLE_ASC</option>
+			<option value="a.title DESC">JGLOBAL_TITLE_DESC</option>
 			<option value="category_title ASC">JCATEGORY_ASC</option>
 			<option value="category_title DESC">JCATEGORY_DESC</option>
+			<option value="a.brand_id ASC">COM_TSWRENT_FILTER_BRAND_ASC</option>
+			<option value="a.brand_id DESC">COM_TSWRENT_FILTER_BRAND_DESC</option>
 			<option value="a.id ASC">JGRID_HEADING_ID_ASC</option>
 			<option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
-			<option value="a.brand ASC">JGLOBAL_DATE_ASC</option>
-			<option value="a.brand DESC">JGLOBAL_DATE_ASC</option>
+
 		</field>
 
 

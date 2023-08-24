@@ -18,6 +18,18 @@
 			>
 			<option value="">JOPTION_SELECT_PUBLISHED</option>
 		</field>
+		<field
+			name="brand_id" 
+			type="brand"
+			label="COM_TSWRENT_BRAND"
+			layout="joomla.form.field.list-fancy-select"
+			validate="options"
+			onchange="this.form.submit();"
+			hint="JOPTION_SELECT"
+			>
+			<option value="">COM_TSWRENT_SELECTE_BRAND</option>
+		</field>
+
 	</fields>
 
 	<fields name="list">

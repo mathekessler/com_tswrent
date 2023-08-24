@@ -1,0 +1,6 @@
+Customer --> view bevor edit like supplier
+
+
+
+
+Supplier/Custommer/Brand -> logo image

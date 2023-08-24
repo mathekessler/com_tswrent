@@ -80,19 +80,22 @@ class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
         /** @var BrandModel $model */
-        $model       = $this->getModel();
-        $this->form  = $model->getForm();
-        $this->item  = $model->getItem();
-        $this->state = $model->getState();
-        $this->canDo = ContentHelper::getActions('com_tswrent');
+        $model          = $this->getModel();
+        $this->form     = $model->getForm();
+        $this->item     = $model->getItem();
+        $this->state    = $model->getState();
+        $this->canDo    = ContentHelper::getActions('com_tswrent');
 		
         // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
-
-        $this->addToolbar();
-
+        if ($this->getLayout() == 'edit') {
+			$this->addToolbar();
+		} 
+        else{
+        $this->addEditToolbar();
+        }
 		parent::display($tpl);
 	}
 
@@ -157,6 +160,37 @@ class HtmlView extends BaseHtmlView
 
         $toolbar->divider();
         $toolbar->help('Banners:_New_or_Edit_Brand');
+
+	}
+
+     /**
+	 * Add the page title and toolbar.
+	 *
+	 * @return  void
+	 *
+	 * @since   __BUMP_VERSION__
+     * 
+	 */
+	protected function addEditToolbar(): void
+	{
+
+        $user       = $this->getCurrentUser();
+        $userId     = $user->id;
+        $isNew      = ($this->item->id == 0);
+        $checkedOut = !(\is_null($this->item->checked_out) || $this->item->checked_out == $userId);
+        $canDo      = $this->canDo;
+        $toolbar    = Toolbar::getInstance();
+
+		ToolbarHelper::title(
+			Text::_('COM_TSWRENT_MANAGER_BRAND_EDIT'),
+			'bookmark tswrent-brands'
+		);
+
+        // If not checked out, can save the item.
+        if (!$checkedOut && ($canDo->get('core.edit') || \count($user->getAuthorisedCategories('com_tswrent', 'core.create')) > 0)) {
+            $toolbar->edit('brand.edit2');
+            $toolbar->cancel('brand.cancel', 'JTOOLBAR_CANCEL');
+        }
 
 	}
 }

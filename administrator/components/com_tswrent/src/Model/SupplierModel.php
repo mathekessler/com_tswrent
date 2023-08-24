@@ -14,6 +14,7 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
 use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
+use TSWEB\Component\Tswrent\Administrator\Helper\ContactHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -35,6 +36,7 @@ class SupplierModel extends AdminModel
      * 
      */
     public $typeAlias = 'com_tswrent.supplier';
+
 
 
     /**
@@ -136,12 +138,15 @@ class SupplierModel extends AdminModel
 
     
     public function getItem($pk = null){
-       
+        
         $item = parent::getItem($pk);
         
-        $supplier_id=$item->id;
-        $item->brand_id= TswrentHelper::getInputSupplierBrandRelation($supplier_id);
-        
+        if (!empty($item->id)) {
+            $id = $item->id;
+            $item->brand_ids =      TswrentHelper::getInputSupplierBrandRelation($id,'supplierbrand');
+            $item->contact_ids =    ContactHelper::getInputContactRelation($id, 'suppliercontact');
+        }
+
         return $item;
     }
 
@@ -209,9 +214,107 @@ class SupplierModel extends AdminModel
      */
     public function save($data)
     {
-        $supplier_id=$data['id'];
-        $brand_id=$data['brand_id'];
-        $data['description']=TswrentHelper::saveSupplierBrandRelation($supplier_id,$brand_id);
-        return parent::save($data);
+            $id=$data['id'];
+            
+            $related_ids=$data['brand_ids'];
+            foreach( $related_ids as $k => $v)
+            {
+                $related_id[]= $v['brand_id'];
+            }
+            //clear empty and 0 item
+            if(!empty($related_id)){
+                $related_id = array_diff($related_id, array(0));
+            }
+            if(!empty($related_id))
+            {
+                $related_id= array_unique($related_id);
+                
+                TswrentHelper::saveSupplierBrandRelation($id,$related_id,'supplierbrand');
+            }else{
+                TswrentHelper::deleteSupplierBrandRelation($id,$related_id,'supplierbrand');
+            }
+            //Save Contact/Customer relation 
+            if(!empty($data['contact_ids'])){
+                $contact_ids=$data['contact_ids'];
+                foreach( $contact_ids as $k => $v)
+                { 
+                    $contact_id[]= $v['contact_id'];
+                }
+                //clear empty and 0 item
+                if(!empty($contact_id)){
+                    $contact_id = array_diff($contact_id, array(0,''));
+                }
+                if(!empty($contact_id))
+                {
+                    $contact_id= array_unique($contact_id);
+                
+                    ContactHelper::saveContactRelation($id,$contact_id,'suppliercontact');
+                }else{
+                    ContactHelper::deleteContactRelation($id,'suppliercontact');
+                }
+            }else{ContactHelper::deleteContactRelation($id,'suppliercontact');}
+
+         return parent::save($data);
     }
+        /**
+     * Method to remove brand from Supplier.
+     *
+     * @param   integer $id  Supplier ID.
+     * 
+     * @param   integer $brand_id  Brand ID to remove.
+     *
+     * @return  boolean  True on success.
+     *
+     *  @since   __BUMP_VERSION__
+     * 
+     */
+    public function removebrand($id,$brand_id)
+    {
+        $db   = Factory::getContainer()->get('DatabaseDriver');
+			// get previous entries
+			$query = $db->getQuery(true);
+			$query->delete($db->quoteName('#__tswrent_brand_supplier_relation'));
+			$query->where('supplier_id = ' . $id);
+			$query->where('brand_id =' .$brand_id);
+			$db->setQuery($query);
+
+            try {
+                $db->execute();
+            } catch (\RuntimeException $e) {
+                $this->setError($e->getMessage());
+    
+                return false;
+            }
+        }
+
+         /**
+     * Method to remove brand from Supplier.
+     *
+     * @param   integer $id  Supplier ID.
+     * 
+     * @param   integer $contact_id  Contact ID to remove.
+     *
+     * @return  boolean  True on success.
+     *
+     *  @since   __BUMP_VERSION__
+     * 
+     */
+    public function removecontact($id,$contact_id)
+    {
+        $db   = Factory::getContainer()->get('DatabaseDriver');
+			// get previous entries
+			$query = $db->getQuery(true);
+			$query->delete($db->quoteName('#__tswrent_contact_relation'));
+			$query->where('supplier_id = ' . $id);
+			$query->where('contact_id =' .$contact_id);
+			$db->setQuery($query);
+
+            try {
+                $db->execute();
+            } catch (\RuntimeException $e) {
+                $this->setError($e->getMessage());
+    
+                return false;
+            }
+        }
 }

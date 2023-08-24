@@ -12,6 +12,7 @@ namespace TSWEB\Component\Tswrent\Administrator\Model;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
+use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -46,7 +47,8 @@ class SuppliersModel extends ListModel
                 'telephone', 'a.telephone',
                 'mobile', 'a.mobile',
                 'mail_to', 'a.mail_to',
-                'website', 'a.website',
+                'webpage', 'a.webpage',
+
             );
 		}
 
@@ -117,33 +119,45 @@ class SuppliersModel extends ListModel
 					'a.published,'.
 					'a.telephone,'.
 					'a.mobile,'.
-					'a.website'				
+					'a.webpage'			
 				)					
            	)
 		
 
 		->from($db->quoteName('#__tswrent_suppliers', 'a'));
+        
+        // Filter by published state
+        $published = (string) $this->getState('filter.published');
 
-		// Filter by search in title
-		if ($search = $this->getState('filter.search')) {
-			if (stripos($search, 'id:') === 0) {
-				$search = (int) substr($search, 3);
-				$query->where($db->quoteName('a.id') . ' = :search')
-					->bind(':search', $search, ParameterType::INTEGER);
-			} else {
-				$search = '%' . str_replace(' ', '%', trim($search)) . '%';
-				$query->where('(' . $db->quoteName('a.title') . ' LIKE :search1 OR ' . $db->quoteName('a.alias') . ' LIKE :search2)')
-					->bind([':search1', ':search2'], $search);
-			}
+        if (is_numeric($published)) {
+            $query->where($db->quoteName('a.published') . ' = ' . (int) $published);
+        } else if ($published === '') {
+            $query->where('(' . $db->quoteName('a.published') . ' = 0 OR ' . $db->quoteName('a.published') . ' = 1)');
+        }
+
+		// Filter by brand.
+		$brandId = $this->getState('filter.brand_id');
+        
+        if (is_numeric($brandId)) 
+        {   
+            //$brandId =      TswrentHelper::getInputSupplierBrandRelation($brandId,'supplier');
+            $query->select(['b.*']);
+            $query->join('INNER',$db->quoteName('#__tswrent_brand_supplier_relation','b').' ON ' . $db->quoteName('b.brand_id') . ' = ' . $brandId)
+            ->where($db->quoteName('b.supplier_id').'='.$db->quoteName('a.id'));
 		}
+        
+		// Filter by search in name.
+		$search = $this->getState('filter.search');
 
-		// Filter by published state
-		$published = (string) $this->getState('filter.published');
-
-		if (is_numeric($published)) {
-			$query->where($db->quoteName('a.published') . ' = ' . (int) $published);
-		} else if ($published === '') {
-			$query->where('(' . $db->quoteName('a.published') . ' = 0 OR ' . $db->quoteName('a.published') . ' = 1)');
+		if (!empty($search)) {
+			if (stripos($search, 'id:') === 0) {
+				$query->where('a.id = ' . (int) substr($search, 3));
+			} else {
+				$search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
+				$query->where(
+					'(' . $db->quoteName('a.title') . ' LIKE ' . $search . ')'
+				);
+			}
 		}
         
         // Add the list ordering clause.
@@ -180,9 +194,6 @@ class SuppliersModel extends ListModel
         if (empty($items)) {
             return [];
         }
-
-        // Getting the following metric by joins is WAY TOO SLOW.
-        // Faster to do three queries for very large banner trees.
 
         // Get the brands in the list.
         $db        = $this->getDatabase();

@@ -49,6 +49,7 @@ class SupplierTable extends Table implements VersionableTableInterface
     public function __construct(DatabaseDriver $db)
     {
         $this->typeAlias = 'com_tswrent.supplier';
+       
         parent::__construct('#__tswrent_suppliers', 'id', $db);
     }
 
