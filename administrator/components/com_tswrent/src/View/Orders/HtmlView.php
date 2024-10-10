@@ -142,17 +142,10 @@ class HtmlView extends BaseHtmlView
 
 			if ($user->authorise('core.admin')) {
 				$childBar->checkin('orders.checkin')->listCheck(true);
-			}
+			
 
-			if ($this->state->get('filter.published') != -2) {
-				$childBar->trash('orders.trash')->listCheck(true);
-			}
-
-			if ($this->state->get('filter.published') == -2 && $canDo->get('core.delete')) {
-				$childBar->delete('orders.delete')
-					->text('JTOOLBAR_EMPTY_TRASH')
-					->message('JGLOBAL_CONFIRM_DELETE')
-					->listCheck(true);
+			
+				$childBar->delete('orders.delete')->listCheck(true);
 			}
 
 			// Add a batch button

@@ -40,7 +40,7 @@ class OrdersModel extends ListModel
 				'id', 'a.id',
 				'title', 'a.title',
 				'catid', 'a.catid', 'category_id', 'category_title',
-				'published', 'a.published',
+				'orderstate', 'a.orderstate',
 				'publish_up', 'a.publish_up',
 			];
 
@@ -71,7 +71,7 @@ class OrdersModel extends ListModel
 					$this->getState(
 						'list.select',
 						'a.id, a.title',
-						'a.published'
+						'a.orderstate'
 					)
 				)
 			)
@@ -79,15 +79,12 @@ class OrdersModel extends ListModel
 
 		$query->from($db->quoteName('#__tswrent_orders', 'a'));
 
-		// Filter by published state
-		$published = (string) $this->getState('filter.published');
+		// Filter by orderstate state
+		$orderstate = (string) $this->getState('filter.orderstate');
 
-		if (is_numeric($published)) {
-			$query->where($db->quoteName('a.published') . ' = ' . (int) $published);
-		} else if ($published === '') {
-			$query->where('(' . $db->quoteName('a.published') . ' = 0 OR ' . $db->quoteName('a.published') . ' = 1)');
-		}
-
+		if (is_numeric($orderstate)) {
+			$query->where($db->quoteName('a.orderstate') . ' = ' . (int) $orderstate);
+		} 
 		// Filter by search in name.
 		$search = $this->getState('filter.search');
 

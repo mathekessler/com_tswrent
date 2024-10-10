@@ -222,31 +222,29 @@ class CustomerModel extends AdminModel
      */
     public function save($data)
     {
-        if (parent::save($data))
-        {
-            $id=$data['id'];
-            //Save Contact/Customer relation 
-            if(!empty($data['contact_ids'])){
-                $customer_ids=$data['customer_ids'];
-                foreach( $customer_ids as $k => $v)
-                { 
-                    $customer_id[]= $v['customer_id'];
-                }
-                //clear empty and 0 item
-                if(!empty($customer_id)){
-                    $customer_id = array_diff($customer_id, array(0,''));
-                }
-                if(!empty($customer_id))
-                {
-                    $customer_id= array_unique($customer_id);
-                
-                    ContactHelper::saveContactRelation($id,$customer_id,'customer');
-                }else{
-                    ContactHelper::deleteContactRelation($id,'customer');
-                }
-            }else{ContactHelper::deleteContactRelation($id,'customer');}
 
-        }
+            $id=$data['id'];
+            $related_ids=$data['contact_ids'];
+
+            //Save Contact/Customer relation 
+            foreach( $related_ids as $k => $v)
+            { 
+                    $related_id[]= $v['contact_id'];
+            }
+            
+            //clear empty and 0 item
+            if(!empty($related_id)){
+                $related_id = array_diff($related_id, array(0));
+            }
+            if(!empty($related_id))
+            {
+                $related_id= array_unique($related_id);
+                
+                ContactHelper::saveContactRelation($id,$related_id,'customercontact');
+            }else{
+                ContactHelper::deleteContactRelation($id,'customercontact');
+            }
+
         return parent::save($data);
     }
 }

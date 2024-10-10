@@ -28,8 +28,9 @@
 			name="webpage" 
 			type="url" 
 			default="http://www.example.com" 
-			label="COM_TSWRENT_FIELD_WEBPAGE" 
-			size="10" 
+			label="COM_TSWRENT_FIELD_WEBPAGE"  
+			filter="url"
+			validate="url"
 		/>
 		<field
 			name="published"
@@ -47,6 +48,7 @@
 	</fieldset>
 
 	<fieldset name="supplier">
+
 		<field
 				name="supplier_ids"
 				type="subform"
@@ -59,8 +61,7 @@
 					<fieldset>
 						<field 
 						name="supplier_id" 
-						type="supplier"
-						validate="options"	
+						type="suppliers"	
 						/>
 					</fieldset>
 				</form>

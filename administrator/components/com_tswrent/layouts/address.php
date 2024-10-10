@@ -11,92 +11,98 @@
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\String\PunycodeHelper;
 
+$user       = Factory::getUser();
+$userId     = $user->get('id');
+$address = $displayData['address'];
 ?>
-<dl class="com-tswrent__address supplier-address dl-horizontal" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+
+<div class="col-6 ">
+    <div class="row">
+<dl class="com-tswrent__address contact-address dl-horizontal" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+    <div class="controls has-success">
+	    <?php echo $address->title ?>
+	</div>
     <?php
     if (
-        ($this->item->address || $this->item->city  || $this->item->postalcode)
+        ($address->address || $address->city  || $address->postalcode)
     ) : ?>
         <dt>
             <span class="icon-address" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('COM_TSWRENT_ADDRESS'); ?></span>
         </dt>
-        <?php if ($this->item->address) : ?>
+        <?php if ($address->address) : ?>
             <dd>
                 <span class="contact-street" itemprop="streetAddress">
-                    <?php echo nl2br($this->item->address, false); ?>
+                    <?php echo nl2br($address->address, false); ?>
                 </span>
             </dd>
         <?php endif; ?>
 
-        <?php if ($this->item->city) : ?>
+        <?php if ($address->city) : ?>
             <dd>
                 <span class="contact-suburb" itemprop="addressLocality">
-                    <?php echo $this->item->city; ?>
+                    <?php echo $address->city; ?>
                 </span>
             </dd>
         <?php endif; ?>
-        <?php if ($this->item->postalcode) : ?>
+        <?php if ($address->postalcode) : ?>
             <dd>
                 <span class="contact-postcode" itemprop="postalCode">
-                    <?php echo $this->item->postalcode; ?>
+                    <?php echo $address->postalcode; ?>
                 </span>
             </dd>
         <?php endif; ?>
     <?php endif; ?>
 
-<?php if ($this->item->email_to) : ?>
+<?php if ($address->email_to) : ?>
     <dt>
         <span class="icon-envelope" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('COM_TSWRENT_EMAIL_LABEL'); ?></span>
     </dt>
     <dd>
         <span class="contact-emailto">
-            <?php echo $this->item->email_to; ?>
+            <?php echo $address->email_to; ?>
         </span>
     </dd>
 <?php endif; ?>
 
-<?php if ($this->item->telephone) : ?>
+<?php if ($address->telephone) : ?>
     <dt>    
         <span class="icon-phone" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('COM_TSWRENT_TELEPHONE'); ?></span>
     </dt>
     <dd>
         <span class="contact-telephone" itemprop="telephone">
-            <?php echo $this->item->telephone; ?>
+            <?php echo $address->telephone; ?>
         </span>
     </dd>
 <?php endif; ?>
-<?php if ($this->item->fax) : ?>
+<?php if ($address->fax) : ?>
     <dt>
             <span class="icon-fax" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('COM_TSWRENT_FAX'); ?></span>
     </dt>
     <dd>
         <span class="contact-fax" itemprop="faxNumber">
-        <?php echo $this->item->fax; ?>
+        <?php echo $address->fax; ?>
         </span>
     </dd>
 <?php endif; ?>
-<?php if ($this->item->mobile) : ?>
+<?php if ($address->mobile) : ?>
     <dt>
             <span class="icon-mobile" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('COM_TSWRENT_MOBILE'); ?></span>
     </dt>
     <dd>
         <span class="contact-mobile" itemprop="telephone">
-            <?php echo $this->item->mobile; ?>
+            <?php echo $address->mobile; ?>
         </span>
     </dd>
 <?php endif; ?>
-<?php if ($this->item->webpage) : ?>
-    <dt>
-            <span class="icon-home" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('COM_TSWRENT_WEBPAGE'); ?></span>
-    </dt>
-    <dd>
-        <span class="contact-webpage">
-            <a href="<?php echo $this->item->webpage; ?>" target="_blank" rel="noopener noreferrer" itemprop="url">
-            <?php echo PunycodeHelper::urlToUTF8($this->item->webpage); ?></a>
-        </span>
-    </dd>
-<?php endif; ?>
+
 </dl>
+
+            </tbody>
+        </table>
+    </div>
+</div>

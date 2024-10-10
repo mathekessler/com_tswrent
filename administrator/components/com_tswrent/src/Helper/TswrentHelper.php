@@ -127,9 +127,17 @@ class TswrentHelper
 		$query->delete($db->quoteName('#__tswrent_brand_supplier_relation'));
 		$query->where($select02.' = ' . $search);
 		$db->setQuery($query);
-		$ret &= ($db->execute() !== false);
+		
+		try {
+			$db->execute();
+		}
+		catch (Exception $e){
+			echo $e->getMessage();
+		}
 	}
-	    /**
+
+
+	/**
      * Load supplier Brand Relation
      *
      * @return  array
@@ -200,8 +208,7 @@ class TswrentHelper
 		case "Supplier":
 			
 			$query->join('INNER',$db->quoteName('#__tswrent_contact_relation','b').' ON ' . $db->quoteName('a.id') . ' = ' . $db->quoteName('b.contact_id'))
-				->whereIn($db->quoteName('b.supplier_id'),$id)
-;
+				->whereIn($db->quoteName('b.supplier_id'),$id);
 
 			$db->setQuery($query);
 			$input = $db->loadObjectList();

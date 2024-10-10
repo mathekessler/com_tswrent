@@ -76,7 +76,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                         <?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->title); ?>
                                     </td>
                                     <td class="text-center">
-                                        <?php echo HTMLHelper::_('jgrid.published', $item->published, $i, 'contactss.', $canChange, 'cb', $item->publish_up, $item->publish_down); ?>
+                                        <?php echo HTMLHelper::_('jgrid.published', $item->published, $i, 'contacts.', $canChange, 'cb', $item->publish_up, $item->publish_down); ?>
                                     </td>
 									<th scope="row" class="has-context">
                                         <div>
@@ -84,7 +84,7 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                                 <?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'contacts.', $canCheckin); ?>
                                             <?php endif; ?>
                                             <?php if ($canEdit) : ?>
-                                                <a href="<?php echo Route::_('index.php?option=com_tswrent&task=contact.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($item->title); ?>">
+                                                <a href="<?php echo Route::_('index.php?option=com_tswrent&view=contact&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($item->title); ?>">
                                                     <?php echo $this->escape($item->title); ?></a>
                                             <?php else : ?>
                                                 <?php echo $this->escape($item->title); ?>

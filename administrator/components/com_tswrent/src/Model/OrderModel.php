@@ -15,7 +15,7 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
-use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
+use TSWEB\Component\Tswrent\Administrator\Helper\OrderHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -48,71 +48,6 @@ class OrderModel extends AdminModel
      * 
      */
     public $typeAlias = 'com_tswrent.order';
-    /**
-     * Batch copy/move command. If set to false, the batch copy/move command is not supported
-     *
-     * @var  string
-     * 
-     *  @since   __BUMP_VERSION__
-     */
-    protected $batch_copymove = 'category_id';
-
-    /**
-     * Allowed batch commands
-     *
-     * @var  array
-     * 
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected $batch_commands = [
-        'brand_id'   => 'batchBrand',
-    ];
-
- /**
-     * Batch protuct changes for a group of orders.
-     *
-     * @param   string  $value     The new value matching a client.
-     * @param   array   $pks       An array of row IDs.
-     * @param   array   $contexts  An array of item contexts.
-     *
-     * @return  boolean  True if successful, false otherwise and internal error is set.
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function batchBrand($value, $pks, $contexts)
-    {
-        // Set the variables
-        $user = $this->getCurrentUser();
-
-        /** @var \TSWEB\Component\Tswrent\Administrator\Table\OrderTable $table */
-        $table = $this->getTable();
-
-        foreach ($pks as $pk) {
-            if (!$user->authorise('core.edit', $contexts[$pk])) {
-                $this->setError(Text::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
-
-                return false;
-            }
-
-            $table->reset();
-            $table->load($pk);
-            $table->cid = (int) $value;
-
-            if (!$table->store()) {
-                $this->setError($table->getError());
-
-                return false;
-            }
-        }
-
-        // Clean the cache
-        $this->cleanCache();
-
-        return true;
-    }
-
 
     /**
      * Method to test whether a record can be deleted.
@@ -198,38 +133,37 @@ class OrderModel extends AdminModel
 
         if (empty($data)) {
             $data = $this->getItem();
-
-            // Prime some default values.
-            if ($this->getState('order.id') == 0) {
-                $filters     = (array) $app->getUserState('com_tswrent.orders.filter');
-                $filterCatId = $filters['category_id'] ?? null;
-
-                $data->set('catid', $app->getInput()->getInt('catid', $filterCatId));
-            }
-
         }
         $this->preprocessData('com_tswrent.order', $data);
 
         return $data;
     }
+    /**
+     * Overloads the parent getItem() method.
+     *
+     * @param   integer  $pk  Primary key
+     *
+     * @return  object|boolean  Object on success, false on failure
+     *
+     * @since  __BUMP_VERSION__
+     * @throws \Exception
+     */
 
     
+     public function getItem($pk = null){
+        
+        $item = parent::getItem($pk);
+        
+        if (!empty($item->id)) {
+            $id = $item->id;
+            $item->days =       OrderHelper::countDays($item->startdate, $item->enddate);
+            $item->hours =      OrderHelper::countHours($item->startdate, $item->enddate);
+            $Factor=      $this->getgraduationFactor($item->graduation, $item->days);
+            $item->factor=  $Factor["factor"];
 
-    /**
-     * A protected method to get a set of ordering conditions.
-     *
-     * @param   Table  $table  A record object.
-     *
-     * @return  array  An array of conditions to add to ordering queries.
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function getReorderConditions($table)
-    {
-        $condition   = array();
-		$condition[] = 'catid = ' . (int) $table->catid;
-        return $condition;
+        }
+
+        return $item;
     }
 
     /**
@@ -245,15 +179,7 @@ class OrderModel extends AdminModel
     protected function prepareTable($table)
     {
         $date = Factory::getDate();
-		$user = Factory::getApplication()->getIdentity();
-
-		$table->title = htmlspecialchars_decode($table->title, ENT_QUOTES);
-		$table->alias = ApplicationHelper::stringURLSafe($table->alias);
-
-		if (empty($table->alias))
-		{
-			$table->alias = ApplicationHelper::stringURLSafe($table->title);
-		}
+        $user = $this->getCurrentUser();
 
 		if (empty($table->id))
 		{
@@ -272,30 +198,6 @@ class OrderModel extends AdminModel
     }
 
     /**
-     * Allows preprocessing of the Form object.
-     *
-     * @param   Form    $form   The form object
-     * @param   array   $data   The data to be merged into the form object
-     * @param   string  $group  The plugin group to be executed
-     *
-     * @return  void
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function preprocessForm(Form $form, $data, $group = 'content')
-    {
-        if ($this->canCreateCategory()) {
-            $form->setFieldAttribute('catid', 'allowAdd', 'true');
-
-            // Add a prefix for categories created on the fly.
-            $form->setFieldAttribute('catid', 'customPrefix', '#new#');
-        }
-
-        parent::preprocessForm($form, $data, $group);
-    }
-
-    /**
      * Method to save the form data.
      *
      * @param   array  $data  The form data.
@@ -307,82 +209,116 @@ class OrderModel extends AdminModel
      */
     public function save($data)
     {
-		$app = Factory::getApplication();
+        $input = Factory::getApplication()->getInput();
 
-        // Cast catid to integer for comparison
-        $catid = (int) $data['catid'];
+        // Alter the name for save as copy
+        if ($input->get('task') == 'save2copy') {
+            /** @var \Joomla\Component\Banners\Administrator\Table\BannerTable $origTable */
+            $origTable = clone $this->getTable();
+            $origTable->load($input->getInt('id'));
 
-        // Check if New Category exists
-        if ($catid > 0)
-        {
-            $catid = CategoriesHelper::validateCategoryId($data['catid'], 'com_tswrent');
+            if ($data['title'] == $origTable->title) {
+                list($title, $alias) = $this->generateNewTitle( $data['alias'], $data['title']);
+                $data['title']       = $title;
+                $data['alias']      = $alias;
+            } else {
+                if ($data['alias'] == $origTable->alias) {
+                    $data['alias'] = '';
+                }
+            }
+
+            $data['state'] = 0;
         }
 
-        // Save New Category
-        if ($catid == 0 && $this->canCreateCategory())
-        {
-            $table              = array();
-            $table['title']     = $data['catid'];
-            $table['parent_id'] = 1;
-            $table['extension'] = 'com_tswrent';
-            $table['language']  = $data['language'];
-            $table['published'] = 1;
-
-            // Create new category and get catid back
-            $data['catid'] = CategoriesHelper::createCategory($table);
-        }
-
-		// Alter the title for save as copy
-		if ($app->input->get('task') == 'save2copy')
-		{
-			list($title, $alias) = $this->generateNewTitle($data['catid'], $data['alias'], $data['title']);
-			$data['title'] = $title;
-			$data['alias'] = $alias;
-			$data['published'] = 0;
-		}
 
         return parent::save($data);
     }
-
-    /**
-	 * Method to change the title & alias.
-	 *
-	 * @param   integer  $category_id  The id of the parent.
-	 * @param   string   $alias        The alias.
-	 * @param   string   $title         The title.
-	 *
-	 * @return  array  Contains the modified title and alias.
-	 *
-	 * @since   3.1
-	 */
-	protected function generateNewTitle($category_id, $alias, $title)
-	{
-		// Alter the title & alias
-		$table = $this->getTable();
-
-		while ($table->load(array('alias' => $alias, 'catid' => $category_id)))
-		{
-			if ($title == $table->title)
-			{
-				$title = StringHelper::increment($title);
-			}
-
-			$alias = StringHelper::increment($alias, 'dash');
-		}
-
-		return array($title, $alias);
-	}
-
-    /**
-     * Is the user allowed to create an on the fly category?
+     /**
+     * Order --> Contacts for selecte customer.
      *
-     * @return  boolean
+     * @param   integer $id  Customer ID.
+     * 
+     *
+     * @return  array  Value and Text for Options.
      *
      *  @since   __BUMP_VERSION__
      * 
      */
-    private function canCreateCategory()
+    public function c_contactid($id)
     {
-        return Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tswrent');
+      $db    = Factory::getDbo();
+        $query = $db->getQuery(true)
+        ->select(
+            [
+                $db->quoteName('a.id', 'value'),
+                $db->quoteName('a.title', 'text'),
+              
+            ]
+        )
+        ->from($db->quoteName('#__tswrent_contacts', 'a'))
+        ->join('LEFT',$db->quoteName('#__tswrent_contact_relation', 'b'), $db->quoteName('b.contact_id').'= '.$db->quoteName('a.id') )
+        ->where($db->quoteName('b.customer_id') . ' ='.$id)
+        ->where($db->quoteName('a.published') . ' = 1')
+        ->order($db->quoteName('a.title'));
+        $db->setQuery($query);
+        
+        try {
+            $rows = $db->loadAssocList();
+
+            } catch (\RuntimeException $e) {
+                $this->setError($e->getMessage());
+    
+                return false;
+            } 
+            
+        return ($rows);
+           
     }
+
+    public function getgraduationFactor($id,$days)
+    {
+        $db    = Factory::getDbo();
+        $query = $db->getQuery(true)
+        ->select('a.graduations')
+        ->from($db->quoteName('#__tswrent_graduations', 'a'))
+        ->where($db->quoteName('a.id') . ' ='.$id);
+        $db->setQuery($query);
+        
+        try {
+            $rows = $db->loadResult();
+            $row = json_decode($rows,true);
+
+        } catch (\RuntimeException $e) {
+           $this->setError($e->getMessage());
+    
+                return false;
+        } 
+        
+        //echo print_r($rows);
+        $searchValue=(int)$days;
+        $foundGraduation = null;
+        $key=true;
+
+        while ($searchValue > 0 && !$foundGraduation) {
+            $array= $row;
+           //echo $searchValue;
+            foreach ($array as $graduationKey => $graduationArray) {
+               // echo $searchValue;
+                //echo print_r($graduationArray["days"]);
+                if ($graduationArray["days"] == $searchValue) 
+                {
+                    //print_r($foundGraduation);
+                    $foundGraduation = $graduationArray;
+                   
+                    break;
+                }
+            }
+            $searchValue--;
+            //echo $searchValue;
+        }
+       
+        return ($foundGraduation);
+    }
+   
+
 }

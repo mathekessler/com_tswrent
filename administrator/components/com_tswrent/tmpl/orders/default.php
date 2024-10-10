@@ -41,16 +41,16 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 						</caption>
 						<thead>
 							<tr>
-								<td style="width:1%" class="text-center">
+								<td class="w-1 text-center">
 									<?php echo HTMLHelper::_('grid.checkall'); ?>
 								</td>
-								<th scope="col" style="width:1%" class="text-center d-none d-md-table-cell">
+								<th scope="col" class="w-10 d-none d-md-table-cell">
 									<?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_TABLE_TABLEHEAD_NAME', 'a.title', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col" style="width:1%; min-width:85px" class="text-center">
-									<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.published', $listDirn, $listOrder); ?>
+								<th scope="col" class=" w-1 text-center">
+									<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.orderstate', $listDirn, $listOrder); ?>
 								</th>
-								<th scope="col">
+								<th scope="col" class="w-1">
 									<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 								</th>
 							</tr>
@@ -61,46 +61,16 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 						foreach ($this->items as $i => $item) :
 							?>
 							<tr class="row<?php echo $i % 2; ?>">
-								<td class="order text-center d-none d-md-table-cell">
-									<?php
-									$iconClass = '';
-									if (!$canChange) {
-										$iconClass = ' inactive';
-									} else if (!$saveOrder) {
-										$iconClass = ' inactive tip-top hasTooltip" title="' . HTMLHelper::_('tooltipText', 'JORDERINGDISABLED');
-									}
-									?>
-									<span class="sortable-handler<?php echo $iconClass; ?>">
-										<span class="icon-menu" aria-hidden="true"></span>
-									</span>
-									<?php if ($canChange && $saveOrder) : ?>
-										<input type="text" style="display:none" name="order[]" size="5"
-											value="<?php echo $item->ordering; ?>" class="width-20 text-area-order">
-									<?php endif; ?>
-								</td>
 								<td class="text-center">
 									<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 								</td>
-								<th scope="row" class="has-context">
-									<?php if ($item->checked_out) : ?>
-										<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'orders.', true); ?>
-									<?php endif; ?>
-									<div>
-										<?php echo $this->escape($item->title); ?>
-									</div>
-									<?php $editIcon = '<span class="fa fa-pencil-square mr-2" aria-hidden="true"></span>'; ?>
-									<a class="hasTooltip" href="<?php echo Route::_('index.php?option=com_orders&task=order.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape(addslashes($item->name)); ?>">
-										<?php echo $editIcon; ?><?php echo $this->escape($item->title); ?></a>
-
-									<div class="small">
-										<?php echo Text::_('JCATEGORY') . ': ' . $this->escape($item->category_title); ?>
-									</div>
+								<th scope="row" >
+									<?php $editIcon = '<span class="icon-edit" aria-hidden="true"></span>'; ?>
+									<a class="hasTooltip" href="<?php echo Route::_('index.php?option=com_tswrent&task=order.edit&id=' . (int) $item->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape(addslashes($item->name)); ?>">
+										<?php echo $this->escape($item->title); ?><?php echo $editIcon; ?></a>
 								</th>
 								<td class="text-center">
-									<?php
-									echo HTMLHelper::_('jgrid.published', $item->published, $i, 'orders.', $canChange, 'cb', $item->publish_up, $item->publish_down);
-									?>
-
+									<?php	echo  $item->orderstate, $i;?>
 								</td>
 								<td class="d-none d-md-table-cell">
 									<?php echo $item->id; ?>

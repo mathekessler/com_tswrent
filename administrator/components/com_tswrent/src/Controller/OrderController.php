@@ -10,6 +10,7 @@
 namespace TSWEB\Component\Tswrent\Administrator\Controller;
 
 use Joomla\CMS\MVC\Controller\FormController;
+use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -44,4 +45,38 @@ class OrderController extends FormController
 
         return parent::batch($model);
     }
+    public function c_contact()
+    {   
+       // Get the model.
+		$model  = $this->getModel();
+		$id    = $this->input->get('id' , 'int');
+		
+		
+
+            // Publish the items.
+            if (!$model->c_contactid($id)) {
+                $this->app->enqueueMessage($model->getError(), 'warning');
+            };
+
+           echo new JsonResponse($model->c_contactid($id));
+
+     }
+
+     public function getgraduationFactor()
+    {   
+       // Get the model.
+		$model  = $this->getModel();
+		$id    = $this->input->get('id' , 'int');
+        $days    = $this->input->get('days' , 'int');
+		
+		
+
+            // Publish the items.
+            if (!$model->getgraduationFactor($id,$days)) {
+                $this->app->enqueueMessage($model->getError(), 'warning');
+            };
+
+           echo new JsonResponse($model->getgraduationFactor($id,$days));
+
+     }
 }

@@ -12,10 +12,12 @@ namespace TSWEB\Component\Tswrent\Administrator\Table;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseDriver;
 use Joomla\CMS\Language\Text;
 use Joomla\Registry\Registry;
+use Joomla\CMS\Date\Date;
 
 /**
  * Orders Table class.
@@ -39,27 +41,6 @@ class OrderTable extends Table
 	}
 
 	/**
-	 * Generate a valid alias from title / date.
-	 * Remains public to be able to check for duplicated alias before saving
-	 *
-	 * @return  string
-	 */
-	public function generateAlias()
-	{
-		if (empty($this->alias)) {
-			$this->alias = $this->name;
-		}
-
-		$this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
-
-		if (trim(str_replace('-', '', $this->alias)) == '') {
-			$this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
-		}
-
-		return $this->alias;
-	}
-
-	/**
 	 * Overloaded check function
 	 *
 	 * @return  boolean
@@ -68,51 +49,59 @@ class OrderTable extends Table
 	 * @since   __BUMP_VERSION__
 	 */
 	public function check()
-	{
-		try {
-			parent::check();
-		} catch (\Exception $e) {
-			$this->setError($e->getMessage());
+    {
+        try {
+            parent::check();
+        } catch (\Exception $e) {
+            $this->setError($e->getMessage());
 
-			return false;
-		}
+            return false;
+        }
 
-		// Check the publish down date is not earlier than publish up.
-		if ($this->publish_down > $this->_db->getNullDate() && $this->publish_down < $this->publish_up) {
-			$this->setError(Text::_('JGLOBAL_START_PUBLISH_AFTER_FINISH'));
+        // Set name
+        $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
 
-			return false;
-		}
+        // Set alias
+        if (trim($this->alias) == '') {
+            $this->alias = $this->title;
+        }
+		$this->alias = ApplicationHelper::stringURLSafe($this->alias);
 
-		// Set publish_up, publish_down to null if not set
-		if (!$this->publish_up) {
-			$this->publish_up = null;
-		}
+        if (trim(str_replace('-', '', $this->alias)) == '') {
+            $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
+        }
+        // Set created date if not set.
+        if (!(int) $this->created) {
+            $this->created = Factory::getDate()->toSql();
+        } 
+        // Set modified to created if not set
+        if (!$this->modified) {
+            $this->modified = $this->created;
+        }
 
-		if (!$this->publish_down) {
-			$this->publish_down = null;
-		}
+        // Set modified_by to created_by if not set
+        if (empty($this->modified_by)) {
+            $this->modified_by = $this->created_by;
+        }
+        
+        // Verify that the alias is unique
+        /** @var BannerTable $table */
+        $table = Table::getInstance('ContactTable', __NAMESPACE__ . '\\', ['dbo' => $db]);
 
-		return true;
-	}
+        if ($table->load(['alias' => $this->alias]) && ($table->id != $this->id || $this->id == 0)) {
+            $this->setError(Text::_('COM_TSWRENT_ERROR_UNIQUE_ALIAS'));
 
-	/**
-	 * Stores a order.
-	 *
-	 * @param   boolean  $updateNulls  True to update fields even if they are null.
-	 *
-	 * @return  boolean  True on success, false on failure.
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function store($updateNulls = true)
-	{
-		// Transform the params field
-		if (is_array($this->params)) {
-			$registry = new Registry($this->params);
-			$this->params = (string) $registry;
-		}
+            return false;
+        }
+        // Check the publish down date is not earlier than publish up.
+        if (!\is_null($this->enddate) && !\is_null($this->startdate) && $this->enddate < $this->startdate) {
+        $this->setError(Text::_('COM_TSWRENT_START_DATE_AFTER_FINISH'));
 
-		return parent::store($updateNulls);
-	}
+        return false;
+        }
+    
+
+    return true;
+    }
+
 }

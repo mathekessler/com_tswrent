@@ -10,7 +10,6 @@
 namespace TSWEB\Component\Tswrent\Administrator\View\Customer;
 
 use Exception;
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
@@ -20,7 +19,6 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use TSWEB\Component\Tswrent\Administrator\Model\CustomerModel;
-
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -87,7 +85,8 @@ class HtmlView extends BaseHtmlView
         $this->canDo    = ContentHelper::getActions('com_tswrent');
 		
         // Check for errors.
-        if (\count($errors = $this->get('Errors'))) {
+        if (\count($errors = $this->get('Errors'))) 
+        {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
         if ($this->getLayout() == 'edit') {
@@ -107,7 +106,7 @@ class HtmlView extends BaseHtmlView
 	 * @since   __BUMP_VERSION__
      * 
 	 */
-	protected function addToolbar(): void
+	protected function addToolbar()
 	{
         Factory::getApplication()->getInput()->set('hidemainmenu', true);
 
@@ -152,10 +151,6 @@ class HtmlView extends BaseHtmlView
             $toolbar->cancel('customer.cancel', 'JTOOLBAR_CANCEL');
         } else {
             $toolbar->cancel('customer.cancel');
-
-            if (ComponentHelper::isEnabled('com_contenthistory') && $this->state->params->get('save_history', 0) && $canDo->get('core.edit')) {
-                $toolbar->versions('com_tswrent.customer', $this->item->id);
-            }
         }
 
         $toolbar->divider();

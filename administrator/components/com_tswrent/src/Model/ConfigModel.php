@@ -15,7 +15,7 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
-use TSWEB\Component\Tswrent\Administrator\Helper\ConfigHelper;
+use TSWEB\Component\Tswrent\Administrator\Helper\ContactHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -64,11 +64,16 @@ class ConfigModel extends AdminModel
     public function getForm($data = [], $loadData = true)
     {
 
+        // Get the form.
+        $form = $this->loadForm('com_tswrent.config', 'config', ['control' => 'jform', 'load_data' => $loadData]);
 
+        if (empty($form)) {
+            return false;
+        }
         return $form;
     }
 
-    /**
+        /**
      * Method to get the data that should be injected in the form.
      *
      * @return  mixed  The data for the form.
@@ -78,11 +83,18 @@ class ConfigModel extends AdminModel
      */
     protected function loadFormData()
     {
+        // Check the session for previously entered form data.
+        $app  = Factory::getApplication();
+        $data = $app->getUserState('com_tswrent.edit.config.data', []);
+
+        if (empty($data)) {
+            $data = $this->getItem();
+
+        }
 
         return $data;
     }
-
-        /**
+      /**
      * Overloads the parent getItem() method.
      *
      * @param   integer  $pk  Primary key
@@ -98,164 +110,23 @@ class ConfigModel extends AdminModel
         
         $item = parent::getItem($pk);
         
+        $item->graduation_ids= $this->getGraduation();
+        $item->tswrentemployee = ContactHelper::getInputTswrentemployee();
         return $item;
     }
 
-    /**
-     * A protected method to get a set of ordering conditions.
-     *
-     * @param   Table  $table  A record object.
-     *
-     * @return  array  An array of conditions to add to ordering queries.
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function getReorderConditions($table)
+    public function getGraduation()
     {
+		$db    = $this->getDatabase();
+        $query = $db->getQuery(true);
 
+        // Select the required fields from the table.
+        $query->select('a.*')
+		->from($db->quoteName('#__tswrent_graduations','a'));
+        $db->setQuery($query);
+		$input = $db->loadObjectList();
+
+        return ($input);
     }
 
-    /**
-     * Prepare and sanitise the table prior to saving.
-     *
-     * @param   Table  $table  A Table object.
-     *
-     * @return  void
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function prepareTable($table)
-    {
-       
-    }
-
-    /**
-     * Allows preprocessing of the Form object.
-     *
-     * @param   Form    $form   The form object
-     * @param   array   $data   The data to be merged into the form object
-     * @param   string  $group  The plugin group to be executed
-     *
-     * @return  void
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function preprocessForm(Form $form, $data, $group = 'content')
-    {
-        if ($this->canCreateCategory()) {
-            $form->setFieldAttribute('catid', 'allowAdd', 'true');
-
-            // Add a prefix for categories created on the fly.
-            $form->setFieldAttribute('catid', 'customPrefix', '#new#');
-        }
-
-        parent::preprocessForm($form, $data, $group);
-    }
-
-    /**
-     * Method to save the form data.
-     *
-     * @param   array  $data  The form data.
-     *
-     * @return  boolean  True on success.
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    public function save($data)
-    {   
-        $id=$data['id'];
-
-        if (parent::save($data))
-        {
-            //Save Config/Supplier relation 
-            if(!empty($data['supplier_ids'])){
-                $supplier_ids=$data['supplier_ids'];
-                foreach( $supplier_ids as $k => $v)
-                { 
-                    $supplier_id[]= $v['supplier_id'];
-                }
-                //clear empty and 0 item
-                if(!empty($supplier_id)){
-                    $supplier_id = array_diff($supplier_id, array(0,''));
-                }
-                if(!empty($supplier_id))
-                {
-                    $supplier_id= array_unique($supplier_id);
-                
-                    ConfigHelper::saveConfigRelation($id,$supplier_id,'supplier');
-                }else{
-                    ConfigHelper::deleteConfigRelation($id,'supplier');
-                }
-            } else{ConfigHelper::deleteConfigRelation($id,'supplier');}  
-
-            //Save Config/Customer relation 
-            if(!empty($data['customer_ids'])){
-                $customer_ids=$data['customer_ids'];
-                foreach( $customer_ids as $k => $v)
-                { 
-                    $customer_id[]= $v['customer_id'];
-                }
-                //clear empty and 0 item
-                if(!empty($customer_id)){
-                    $customer_id = array_diff($customer_id, array(0,''));
-                }
-                if(!empty($customer_id))
-                {
-                    $customer_id= array_unique($customer_id);
-                
-                    ConfigHelper::saveConfigRelation($id,$customer_id,'customer');
-                }else{
-                    ConfigHelper::deleteConfigRelation($id,'customer');
-                }
-            }else{ConfigHelper::deleteConfigRelation($id,'customer');}
-        }
-
-        return parent::save($data);
-    }
-
-    /**
-	 * Method to change the title & alias.
-	 *
-	 * @param   integer  $category_id  The id of the parent.
-	 * @param   string   $alias        The alias.
-	 * @param   string   $title         The title.
-	 *
-	 * @return  array  Contains the modified title and alias.
-	 *
-	 * @since   3.1
-	 */
-	protected function generateNewTitle($category_id, $alias, $title)
-	{
-		// Alter the title & alias
-		$table = $this->getTable();
-
-		while ($table->load(array('alias' => $alias, 'catid' => $category_id)))
-		{
-			if ($title == $table->title)
-			{
-				$title = StringHelper::increment($title);
-			}
-
-			$alias = StringHelper::increment($alias, 'dash');
-		}
-
-		return array($title, $alias);
-	}
-
-    /**
-     * Is the user allowed to create an on the fly category?
-     *
-     * @return  boolean
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    private function canCreateCategory()
-    {
-        return Factory::getApplication()->getIdentity()->authorise('core.create', 'com_tswrent');
-    }
 }

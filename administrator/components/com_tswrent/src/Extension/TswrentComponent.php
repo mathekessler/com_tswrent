@@ -11,13 +11,10 @@ namespace TSWEB\Component\Tswrent\Administrator\Extension;
 
 use Joomla\CMS\Categories\CategoryServiceInterface;
 use Joomla\CMS\Categories\CategoryServiceTrait;
-use Joomla\CMS\Component\Router\RouterServiceInterface;
-use Joomla\CMS\Component\Router\RouterServiceTrait;
 use Joomla\CMS\Extension\BootableExtensionInterface;
 use Joomla\CMS\Extension\MVCComponent;
 use Joomla\CMS\HTML\HTMLRegistryAwareTrait;
 use TSWEB\Component\Tswrent\Administrator\Service\HTML\AdministratorService;
-use Joomla\CMS\Helper\ContentHelper;
 use Psr\Container\ContainerInterface;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -29,11 +26,13 @@ use Psr\Container\ContainerInterface;
  *
  *  @since   __BUMP_VERSION__
  */
-class TswrentComponent extends MVCComponent implements BootableExtensionInterface, CategoryServiceInterface, RouterServiceInterface
+class TswrentComponent extends MVCComponent implements 
+
+BootableExtensionInterface, 
+CategoryServiceInterface
 {
 	use CategoryServiceTrait;
 	use HTMLRegistryAwareTrait;
-	use RouterServiceTrait;
 
 
   /**

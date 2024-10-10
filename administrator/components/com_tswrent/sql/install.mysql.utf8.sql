@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_contacts` (
   `mobile` varchar(255)NOT NULL DEFAULT '',
   `email_to` varchar(255)NOT NULL DEFAULT '',
 
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -60,12 +60,24 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_contacts` (
 --
 
 CREATE TABLE IF NOT EXISTS `#__tswrent_contact_relation` (
+  `contact_id` int(10) unsigned NOT NULL DEFAULT 0,
   `brand_id` int(10) unsigned NOT NULL DEFAULT 0,
   `supplier_id` int(10) unsigned NOT NULL DEFAULT 0,
   `customer_id` int(10) unsigned NOT NULL DEFAULT 0,
   `tswrent` tinyint(2) unsigned NOT NULL DEFAULT 0,
   
-  PRIMARY KEY (`brand_id`,`custommer_id`,`supplier_id`,`tswrent`)
+  PRIMARY KEY (`contact_id`,`brand_id`,`customer_id`,`supplier_id`,`tswrent`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Table structure for table `#__tswrent_config`
+--
+
+CREATE TABLE IF NOT EXISTS `#__tswrent_config` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `company` varchar(255) NOT NULL DEFAULT '',
+
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -89,18 +101,11 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_customers` (
   `telephone` varchar(255)NOT NULL DEFAULT '',
   `mobile` varchar(255)NOT NULL DEFAULT '',
   `email_to` varchar(255)NOT NULL DEFAULT '',
+  `webpage`text NOT NULL,
 
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
---
--- Table structure for table `#__tswrent_suppliers`
---
-
-CREATE TABLE IF NOT EXISTS `#__tswrent_config` (
-  `title`  varchar(255) NOT NULL DEFAULT '',
-  `value` text NOT NULL,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Table structure for table `#__tswrent_graduations`
@@ -108,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_config` (
 CREATE TABLE IF NOT EXISTS `#__tswrent_graduations` (
   `id` int (11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL ,
+   `alias` varchar(400) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
   `description` text NOT NULL,
   `created` datetime NOT NULL,
   `created_by` int unsigned NOT NULL DEFAULT 0,
@@ -117,8 +123,11 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_graduations` (
   `published` tinyint unsigned NOT NULL DEFAULT 0,
   `graduations` text NOT NULL,
 
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+
+
 
 --
 -- Table structure for table `#__tswrent_orders`
@@ -134,17 +143,18 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_orders` (
   `created_by_alias` varchar(255) NOT NULL DEFAULT '',
   `modified` datetime NOT NULL,
   `modified_by` int unsigned NOT NULL DEFAULT 0,
-  `published` tinyint unsigned NOT NULL DEFAULT 0,
-  `tswrent_rev` int(11) NOT NULL DEFAULT '',
-  `customer` int(11) NOT NULL DEFAULT '',
-  `customer_rev` int(11) NOT NULL DEFAULT '',
+  `orderstate` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `contact` int(10) NOT NULL DEFAULT 0,
+  `customer` int(10) NOT NULL DEFAULT 0,
+  `c_contact` int(10) NOT NULL DEFAULT 0,
   `startdate` datetime NOT NULL,
   `enddate` datetime NOT NULL,
-  `graduation` varchar(255) NOT NULL DEFAULT '',
-  `orderdiscount` int(4) unsigned NOT NULL DEFAULT 0,
+  `graduation` int(10) NOT NULL DEFAULT 0,
+  `orderdiscount` int(10) unsigned NOT NULL DEFAULT 0,
 
   PRIMARY KEY (`id`),
   KEY `idx_customer` (`customer`),
+  KEY `idx_contact` (`contact`),
   KEY `idx_startdate` (`startdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
@@ -230,6 +240,6 @@ CREATE TABLE IF NOT EXISTS `#__tswrent_suppliers` (
 -- Load default value for `#__tswrent_graduations`
 --
 
-INSERT IGNORE INTO `#__tswrent_graduations` (`id`, `title`, `alias`, `description`, `created`, `created_by`, `created_by_alias`, `modified`, `modified_by`, `published`, `graduations`) VALUES
-(1, 'Default', 'default', '', '', , '', '', , 1, '{\"graduations0\":{\"duration\":\"1\",\"unit\":\"1\",\"factor\":\"1\"},\"graduations1\":{\"duration\":\"2\",\"unit\":\"1\",\"factor\":\"1.5\"},\"graduations2\":{\"duration\":\"3\",\"unit\":\"1\",\"factor\":\"2\"},\"graduations5\":{\"duration\":\"4\",\"unit\":\"1\",\"factor\":\"2.5\"},\"graduations4\":{\"duration\":\"5\",\"unit\":\"1\",\"factor\":\"3\"},\"graduations3\":{\"duration\":\"6\",\"unit\":\"1\",\"factor\":\"3.5\"},\"graduations14\":{\"duration\":\"1\",\"unit\":\"0\",\"factor\":\"4\"},\"graduations13\":{\"duration\":\"2\",\"unit\":\"0\",\"factor\":\"6\"},\"graduations12\":{\"duration\":\"3\",\"unit\":\"0\",\"factor\":\"7\"},\"graduations11\":{\"duration\":\"4\",\"unit\":\"0\",\"factor\":\"8\"},\"graduations10\":{\"duration\":\"5\",\"unit\":\"0\",\"factor\":\"9\"},\"graduations9\":{\"duration\":\"6\",\"unit\":\"0\",\"factor\":\"10\"},\"graduations8\":{\"duration\":\"7\",\"unit\":\"0\",\"factor\":\"11\"},\"graduations7\":{\"duration\":\"8\",\"unit\":\"0\",\"factor\":\"12\"},\"graduations6\":{\"duration\":\"9\",\"unit\":\"0\",\"factor\":\"13\"}}');
+INSERT IGNORE INTO `#__tswrent_graduations` (`id`, `title`,  `graduations`) VALUES
+(1, 'Default',  '{\"graduations0\":{\"duration\":\"1\",\"unit\":\"1\",\"factor\":\"1\"},\"graduations1\":{\"duration\":\"2\",\"unit\":\"1\",\"factor\":\"1.5\"},\"graduations2\":{\"duration\":\"3\",\"unit\":\"1\",\"factor\":\"2\"},\"graduations5\":{\"duration\":\"4\",\"unit\":\"1\",\"factor\":\"2.5\"},\"graduations4\":{\"duration\":\"5\",\"unit\":\"1\",\"factor\":\"3\"},\"graduations3\":{\"duration\":\"6\",\"unit\":\"1\",\"factor\":\"3.5\"},\"graduations14\":{\"duration\":\"1\",\"unit\":\"0\",\"factor\":\"4\"},\"graduations13\":{\"duration\":\"2\",\"unit\":\"0\",\"factor\":\"6\"},\"graduations12\":{\"duration\":\"3\",\"unit\":\"0\",\"factor\":\"7\"},\"graduations11\":{\"duration\":\"4\",\"unit\":\"0\",\"factor\":\"8\"},\"graduations10\":{\"duration\":\"5\",\"unit\":\"0\",\"factor\":\"9\"},\"graduations9\":{\"duration\":\"6\",\"unit\":\"0\",\"factor\":\"10\"},\"graduations8\":{\"duration\":\"7\",\"unit\":\"0\",\"factor\":\"11\"},\"graduations7\":{\"duration\":\"8\",\"unit\":\"0\",\"factor\":\"12\"},\"graduations6\":{\"duration\":\"9\",\"unit\":\"0\",\"factor\":\"13\"}}');
 

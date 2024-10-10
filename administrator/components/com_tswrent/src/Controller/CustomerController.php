@@ -31,4 +31,19 @@ class CustomerController extends FormController
      */
     protected $text_prefix = 'COM_TSWRENT_CUSTOMER';
 
+
+
+    	/**
+	 * Method to edit supplier.
+	 *
+	 * @return  void
+	 *
+	 * @since   __BUMP_VERSION__
+	 */
+	public function edit2()
+	{
+        $id    = $this->input->get('id');
+
+        $this->setRedirect('index.php?option=com_tswrent&task=customer.edit&id='.$id);
+    }
 }

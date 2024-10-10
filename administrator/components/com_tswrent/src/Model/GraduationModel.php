@@ -134,14 +134,10 @@ class GraduationModel extends AdminModel
         if (empty($data)) {
             $data = $this->getItem();
 
-            // Prime some default values.
-            if ($this->getState('graduation.id') == 0) {
-                $filters     = (array) $app->getUserState('com_tswrent.graduations.filter');
-            }
-
         }
+        
         $this->preprocessData('com_tswrent.graduation', $data);
-
+        
         return $data;
     }
 
@@ -158,15 +154,7 @@ class GraduationModel extends AdminModel
     protected function prepareTable($table)
     {
         $date = Factory::getDate();
-		$user = Factory::getApplication()->getIdentity();
-
-		$table->title = htmlspecialchars_decode($table->title, ENT_QUOTES);
-		$table->alias = ApplicationHelper::stringURLSafe($table->alias);
-
-		if (empty($table->alias))
-		{
-			$table->alias = ApplicationHelper::stringURLSafe($table->title);
-		}
+        $user = $this->getCurrentUser();
 
 		if (empty($table->id))
 		{
@@ -196,47 +184,7 @@ class GraduationModel extends AdminModel
      */
     public function save($data)
     {
-		$app = Factory::getApplication();
-
-
-		// Alter the title for save as copy
-		if ($app->input->get('task') == 'save2copy')
-		{
-			list($title, $alias) = $this->generateNewTitle($data['alias'], $data['title']);
-			$data['title'] = $title;
-			$data['alias'] = $alias;
-			$data['published'] = 0;
-		}
-
         return parent::save($data);
     }
 
-    /**
-	 * Method to change the title & alias.
-	 *
-	 * @param   integer  $category_id  The id of the parent.
-	 * @param   string   $alias        The alias.
-	 * @param   string   $title         The title.
-	 *
-	 * @return  array  Contains the modified title and alias.
-	 *
-	 * @since   3.1
-	 */
-	protected function generateNewTitle($category_id, $alias, $title)
-	{
-		// Alter the title & alias
-		$table = $this->getTable();
-
-		while ($table->load(array('alias' => $alias)))
-		{
-			if ($title == $table->title)
-			{
-				$title = StringHelper::increment($title);
-			}
-
-			$alias = StringHelper::increment($alias, 'dash');
-		}
-
-		return array($title, $alias);
-	}
 }

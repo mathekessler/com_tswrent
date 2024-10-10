@@ -9,6 +9,8 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
+
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
@@ -73,7 +75,6 @@ class CustomersModel extends ListModel
 					$db->quoteName(	'a.title'),
 					$db->quoteName(	'a.alias'),
 					$db->quoteName(	'a.published'),
-
 				]					
            	)
 		)
@@ -127,6 +128,9 @@ class CustomersModel extends ListModel
 	 */
     protected function populateState($ordering = 'a.title', $direction = 'asc')
     {
+		// Load the parameters.
+        $this->setState('params', ComponentHelper::getParams('com_tswrent'));
+
         // List state information.
         parent::populateState($ordering, $direction);
     }

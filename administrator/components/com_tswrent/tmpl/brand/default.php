@@ -13,7 +13,6 @@
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Associations;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
@@ -61,48 +60,11 @@ $wa->useScript('keepalive')
 								</dl>
 							</div>
 						</div>
-						<div class="col-6 ">
-							<div class="row">
-								<!-- Address Block -->
-								<table class="table">
-									<caption class="visually-hidden">
-										<?php echo Text::_('COM_TSWRENT_SUPPLIERS_TABLE_CAPTION'); ?>,
-										<span id="orderedBy"><?php echo Text::_('JGLOBAL_SORTED_BY'); ?> </span>,
-										<span id="filteredBy"><?php echo Text::_('JGLOBAL_FILTERED_BY'); ?></span>
-									</caption>
-									<thead>
-										<tr>
-											<th scope="col" class="w-10  d-none d-md-table-cell">
-												<span ><?php echo Text::_('COM_TSWRENT_HEADING_TITLE'); ?></span>
-											</th>
-											<th scope="col" class="w-5 text-center d-none d-md-table-cell">
-												<span ><?php echo Text::_('COM_TSWRENT_HEADING_WEBPAGE'); ?></span>
-											</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php foreach ($this->item->supplier_ids as $supplier) :
-											$canCreate  = $user->authorise('core.create','com_tswrent');
-											$canEdit    = $user->authorise('core.edit', 'com_tswrent');
-											$canCheckin = $user->authorise('core.manage', 'com_checkin') || $this->item->checked_out == $userId || is_null($this->item->checked_out);
-											$canChange  = $user->authorise('core.edit.state', 'com_tswrent') && $canCheckin;
-											?>
-											<tr class="row<?php echo $i % 2; ?>">
-
-												<th scope="row" >
-												<a href="<?php echo Route::_('index.php?option=com_tswrent&view=supplier&id=' . (int) $supplier->id); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?> <?php echo $this->escape($supplier->title); ?>">
-															<?php echo $this->escape($supplier->title); ?></a>
-													<?php echo $brand->title ; ?>
-												</td>
-												<td class="text-center">
-													<a href="<?php echo $supplier->webpage; ?>" target="_blank" rel="noopener noreferrer" itemprop="url">
-													<?php echo PunycodeHelper::urlToUTF8($supplier->webpage); ?></a>
-												</td>
-											</tr>
-										<?php endforeach; ?>
-									</tbody>
-								</table>
-							</div>
+						<div>
+							<?php /** load Suppliers Layout **/
+								$data = ['supplier' => $this->item->supplier_ids];  // Prepare data to pass
+								echo \Joomla\CMS\Layout\LayoutHelper::render('suppliers', $data, 'com_tswrent.layouts');  // Load the layout 
+							?>
 						</div>
 					</div>
 				</div>
@@ -110,7 +72,10 @@ $wa->useScript('keepalive')
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'products', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_PRODUCTS') : Text::_('COM_TSWRENT_FIELDSET_PRODUCTS')); ?>	
 			<div class="com-contact__info">
-            	<?php echo $this->loadTemplate('products'); ?>
+				<?php /** load Suppliers Layout **/
+					$data = ['products' => $this->item->product_ids];  // Prepare data to pass
+					echo \Joomla\CMS\Layout\LayoutHelper::render('products', $data, 'com_tswrent.layouts');  // Load the layout 
+				?>
 			</div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 	<?php echo HTMLHelper::_('uitab.endTabSet'); ?>

@@ -87,10 +87,11 @@ class HtmlView extends BaseHtmlView
         $this->canDo    = ContentHelper::getActions('com_tswrent');
 		
         // Check for errors.
-        if (\count($errors = $this->get('Errors'))) {
-            throw new GenericDataException(implode("\n", $errors), 500);
-        }
-        if ($this->getLayout() == 'edit') {
+		if (count($errors = $this->get('Errors')))
+		{
+			throw new GenericDataException(implode("\n", $errors), 500);
+		}
+		if ($this->getLayout() == 'edit') {
 			$this->addToolbar();
 		} 
         else{

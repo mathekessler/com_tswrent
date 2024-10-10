@@ -12,7 +12,6 @@
 // phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\Categories\CategoryFactoryInterface;
-use Joomla\CMS\Component\Router\RouterFactoryInterface;
 use Joomla\CMS\Dispatcher\ComponentDispatcherFactoryInterface;
 use Joomla\CMS\Extension\ComponentInterface;
 use Joomla\CMS\Extension\Service\Provider\CategoryFactory;
@@ -48,8 +47,7 @@ return new class () implements ServiceProviderInterface {
         $container->registerServiceProvider(new CategoryFactory($componentNamespace));
         $container->registerServiceProvider(new MVCFactory($componentNamespace));
         $container->registerServiceProvider(new ComponentDispatcherFactory($componentNamespace));
-        $container->registerServiceProvider(new RouterFactory($componentNamespace));
-
+       
         $container->set(
             ComponentInterface::class,
             function (Container $container) {
@@ -58,7 +56,7 @@ return new class () implements ServiceProviderInterface {
 				$component->setRegistry($container->get(Registry::class));
 				$component->setMVCFactory($container->get(MVCFactoryInterface::class));
 				$component->setCategoryFactory($container->get(CategoryFactoryInterface::class));
-                $component->setRouterFactory($container->get(RouterFactoryInterface::class));
+
 
 
                 return $component;

@@ -1,6 +1,12 @@
-Customer --> view bevor edit like supplier
+Order
+    Products
+        product -->  Modal Select
+        Description--> Text
+        price--> Text Read only
+        Stock --> List with product stock at first --> later check how many are free at this days
+        discount --> Text default 0, onchange --> calculation of price
+        total price--> text readonly 
 
 
 
-
-Supplier/Custommer/Brand -> logo image
+Supplier/Customer/Brand -> logo image

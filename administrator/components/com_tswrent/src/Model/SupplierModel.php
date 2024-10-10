@@ -214,8 +214,9 @@ class SupplierModel extends AdminModel
      */
     public function save($data)
     {
-            $id=$data['id'];
-            
+            $id=$data['id']; 
+
+            //Save Suplyer/Brand relation 
             $related_ids=$data['brand_ids'];
             foreach( $related_ids as $k => $v)
             {
@@ -231,29 +232,27 @@ class SupplierModel extends AdminModel
                 
                 TswrentHelper::saveSupplierBrandRelation($id,$related_id,'supplierbrand');
             }else{
-                TswrentHelper::deleteSupplierBrandRelation($id,$related_id,'supplierbrand');
+                TswrentHelper::deleteSupplierBrandRelation($id,'supplierbrand');
             }
+            
             //Save Contact/Customer relation 
-            if(!empty($data['contact_ids'])){
-                $contact_ids=$data['contact_ids'];
-                foreach( $contact_ids as $k => $v)
-                { 
-                    $contact_id[]= $v['contact_id'];
-                }
-                //clear empty and 0 item
-                if(!empty($contact_id)){
-                    $contact_id = array_diff($contact_id, array(0,''));
-                }
-                if(!empty($contact_id))
-                {
-                    $contact_id= array_unique($contact_id);
+            $contact_ids=$data['contact_ids'];
+            foreach( $contact_ids as $k => $v)
+            { 
+                $contact_id[]= $v['contact_id'];
+            }
+            //clear empty and 0 item
+            if(!empty($contact_id)){
+                $contact_id = array_diff($contact_id, array(0,''));
+            }
+            if(!empty($contact_id))
+            {
+                $contact_id= array_unique($contact_id);
                 
-                    ContactHelper::saveContactRelation($id,$contact_id,'suppliercontact');
-                }else{
-                    ContactHelper::deleteContactRelation($id,'suppliercontact');
-                }
-            }else{ContactHelper::deleteContactRelation($id,'suppliercontact');}
-
+                ContactHelper::saveContactRelation($id,$contact_id,'suppliercontact');
+            }else{
+                ContactHelper::deleteContactRelation($id,'suppliercontact');
+            }
          return parent::save($data);
     }
         /**

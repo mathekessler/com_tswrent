@@ -10,12 +10,15 @@
 namespace TSWEB\Component\Tswrent\Administrator\View\Config;
 
 use Exception;
+use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use TSWEB\Component\Tswrent\Administrator\Model\ConfigModel;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -29,6 +32,35 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
  */
 class HtmlView extends BaseHtmlView
 {
+		/**
+	 * The \JForm object
+	 *
+	 * @var  \JForm
+	 */
+	protected $form;
+
+	/**
+	 * The active item
+	 *
+	 * @var  object
+	 */
+	protected $item;
+	
+	/**
+	 * The model state
+	 *
+	 * @var    object
+	 */
+	protected $state;
+
+	/**
+     * Object containing permissions for the item
+     *
+     * @var    CMSObject
+     * 
+     * @since  __BUMP_VERSION__
+     */
+    protected $canDo;
 	/**
 	 * Display the view.
 	 *
@@ -41,13 +73,18 @@ class HtmlView extends BaseHtmlView
 	 */
 	public function display($tpl = null): void
 	{
+		/** @var ContactModel $model */
+		$model       = $this->getModel();
+		$this->form  = $model->getForm();
+		$this->item  = $model->getItem();
+		$this->state = $model->getState();
+		$this->canDo    = ContentHelper::getActions('com_tswrent');
 		
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))
 		{
 			throw new GenericDataException(implode("\n", $errors), 500);
 		}
-
 
         $this->addToolbar();
 

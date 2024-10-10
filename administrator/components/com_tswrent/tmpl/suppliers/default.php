@@ -23,6 +23,10 @@ $userId     = $user->get('id');
 $listOrder  = $this->escape($this->state->get('list.ordering'));
 $listDirn   = $this->escape($this->state->get('list.direction'));
 
+$wa = $this->document->getWebAssetManager();
+$wa ->useScript('core');
+	
+
 ?>    
 <form action="<?php echo Route::_('index.php?option=com_tswrent&view=suppliers'); ?>" method="post" name="adminForm" id="adminForm">
     <div class="row">

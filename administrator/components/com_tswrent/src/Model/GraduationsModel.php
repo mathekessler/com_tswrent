@@ -9,8 +9,10 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
+
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -37,6 +39,7 @@ class GraduationsModel extends ListModel
 	 */
 	public function __construct($config = [])
 	{
+		
 		if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
 				'id', 'a.id',	
@@ -76,6 +79,7 @@ class GraduationsModel extends ListModel
 				]					
            	)
 		)
+		
 		->from($db->quoteName('#__tswrent_graduations', 'a'));
 
 		// Filter by search in title
@@ -123,6 +127,9 @@ class GraduationsModel extends ListModel
 	 */
     protected function populateState($ordering = 'a.title', $direction = 'asc')
     {
+		// Load the parameters.
+        $this->setState('params', ComponentHelper::getParams('com_tswrent'));
+
         // List state information.
         parent::populateState($ordering, $direction);
     }

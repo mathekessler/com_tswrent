@@ -6,11 +6,11 @@ DROP TABLE IF EXISTS `#__tswrent_config`;
 
 DROP TABLE IF EXISTS `#__tswrent_contacts`;
 
-DROP TABLE IF EXISTS `#__tswrent_contacts_relation`;
+DROP TABLE IF EXISTS `#__tswrent_contact_relation`;
 
 DROP TABLE IF EXISTS `#__tswrent_customers`;
 
-DROP TABLE IF EXISTS `#__tswrent_graduationss`;
+DROP TABLE IF EXISTS `#__tswrent_graduations`;
 
 DROP TABLE IF EXISTS `#__tswrent_orders`;
 

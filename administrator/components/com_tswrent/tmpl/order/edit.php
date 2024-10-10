@@ -13,7 +13,6 @@
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Associations;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
@@ -21,16 +20,10 @@ use Joomla\CMS\Layout\LayoutHelper;
 $app = Factory::getApplication();
 $input = $app->input;
 
-$assoc = Associations::isEnabled();
-
-$this->ignore_fieldsets = ['item_associations'];
-$this->useCoreUI = true;
-
+/** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('keepalive')
-	->useScript('form.validate')
-	->useScript('inlinehelp');
-
+$wa	->useScript('form.validate')
+	->useScript('com_tswrent.admin-order-edit');
 ?>
 <form action="<?php echo Route::_('index.php?option=com_tswrent&layout=' . $layout . $tmpl . '&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="product-form" class="form-validate">
 
@@ -49,6 +42,11 @@ $wa->useScript('keepalive')
 						</fieldset>
 					</div>
 				</div>	
+			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'products', Text::_('COM_TSWRENT_FIELDSET_PRODUCTS')); ?>
+					<?php echo $this->loadTemplate('products'); ?>
+
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('JGLOBAL_FIELDSET_PUBLISHING')); ?>

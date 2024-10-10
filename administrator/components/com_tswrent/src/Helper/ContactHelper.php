@@ -41,62 +41,30 @@ class ContactHelper
 			case "suppliercontact":
 				$select01 = 'b.contact_id';
 				$select02 = 'b.supplier_id';
-				break;
+				$table= 'contacts';
+			break;
 			case "customercontact":
 				$select01 = 'b.contact_id';
 				$select02 = 'b.customer_id';
-				break;
+				$table= 'contacts';
+			break;
+			case "contactsupplier":
+				$select01 = 'b.supplier_id';
+				$select02 = 'b.contact_id';
+				$table= 'suppliers';
+			break;
+			case "contactcustomer":
+				$select01 = 'b.customer_id';
+				$select02 = 'b.contact_id';
+				$table= 'customers';
+			break;
 		}		
 		// get previous entries
 		$query = $db->getQuery(true);
 		$query->select(['a.*', $select01])
-			->from($db->quoteName('#__tswrent_contacts','a'))
+			->from($db->quoteName('#__tswrent_'.$table,'a'))
 			->join('inner',$db->quoteName('#__tswrent_contact_relation','b').'ON' .$db->quoteName($select02).'=' .$id)
 			->where($db->quoteName('a.id'). '=' .$db->quoteName($select01));
-		$db->setQuery($query);
-		$input = $db->loadObjectList();
-        return ($input);   
-    }
-	
-    /**
-     * Load Supplier Contact Relation
-     *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
-     */
-    public static function getInputSupplierRelation($id){
-       
-		$db   = Factory::getContainer()->get('DatabaseDriver');
-			
-		// get previous entries
-		$query = $db->getQuery(true);
-		$query->select(['a.supplier_id',])
-			->from($db->quoteName('#__tswrent_contact_relation','a'))
-			->where($db->quoteName('a.contact_id'). '=' .$id)
-            ->where($db->quoteName('a.supplier_id'). '!= 0 ');
-		$db->setQuery($query);
-		$input = $db->loadObjectList();
-        return ($input);   
-    }
-
-	/**
-     * Load Supplier Contact Relation
-     *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
-     */
-    public static function getInputCustomerRelation($id){
-       
-		$db   = Factory::getContainer()->get('DatabaseDriver');
-			
-		// get previous entries
-		$query = $db->getQuery(true);
-		$query->select(['a.customer_id',])
-			->from($db->quoteName('#__tswrent_contact_relation','a'))
-			->where($db->quoteName('a.contact_id'). '=' .$id)
-            ->where($db->quoteName('a.customer_id'). '!= 0 ');
 		$db->setQuery($query);
 		$input = $db->loadObjectList();
         return ($input);   
@@ -124,6 +92,28 @@ class ContactHelper
         return ($input);   
     }
 
+		/**
+     * Load Supplier Contact Relation
+     *
+     * @return  array
+     * 
+     *  @since   __BUMP_VERSION__
+     */
+    public static function getInputTswrentemployee(){
+       
+		$db   = Factory::getContainer()->get('DatabaseDriver');
+			
+		// get previous entries
+		$query = $db->getQuery(true);
+		$query->select(['a.*'])
+			->from($db->quoteName('#__tswrent_contacts','a'))
+			->join('inner',$db->quoteName('#__tswrent_contact_relation','b').'ON' .$db->quoteName('b.tswrent').'!= 0');
+		$db->setQuery($query);
+		$input = $db->loadObjectList();
+
+        return ($input);   
+    }
+
 	    /**
      * delete Contact Relation
      *
@@ -140,7 +130,7 @@ class ContactHelper
 			/** supplier relations */
 			case "contactsupplier":
 				$select01 = 'contact_id';
-				$select01 = 'supplier_id';
+				$select02 = 'supplier_id';
 				break;
 			case "contactcustomer":
 				$select01 = 'contact_id';
@@ -154,6 +144,10 @@ class ContactHelper
 				$select01 = 'supplier_id';
 				$select02 = 'contact_id';
 				break;
+			case "customercontact":
+				$select01 = 'customer_id';
+				$select02 = 'contact_id';
+			break;
 
 		}	
 
@@ -234,7 +228,6 @@ class ContactHelper
 
 		$del_reccur = array_diff($cur_reccur, $new_items);
 		$add_reccur = array_diff($new_items, $cur_reccur);
-
 		if (!empty($del_reccur)) {
 			$query = $db->getQuery(true);
 			$query->delete($db->quoteName('#__tswrent_contact_relation'));
@@ -254,19 +247,6 @@ class ContactHelper
 			$db->setQuery($query);
 			$ret &= ($db->execute() !== false);
 		}
-
 		return true;
-    }
-
-    /**
-     * set TSW Rent Relation
-     *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
-     */
-    public static function setTswrentRelation($id, $related_id)
-    {
-
     }
 }

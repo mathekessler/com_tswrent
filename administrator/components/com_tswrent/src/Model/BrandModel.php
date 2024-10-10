@@ -12,8 +12,10 @@ namespace TSWEB\Component\Tswrent\Administrator\Model;
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
+use Joomla\CMS\Table\TableInterface;
 use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -106,12 +108,18 @@ class BrandModel extends AdminModel
     */
     public function getForm($data = [], $loadData = true)
     {
+        
+        $clientId = $this->getState('item.client_id');
         // Get the form.
-        $form = $this->loadForm('com_tswrent.brand', 'brand', ['control' => 'jform', 'load_data' => $loadData]);
+        $form = $this->loadForm('com_tswrent.brand', 'brand', ['control' => 'jform', 'load_data' => $loadData], true);
 
         if (empty($form)) {
             return false;
         }
+        if ($loadData) {
+            $data = $this->loadFormData();
+        }
+
 
         return $form;
     }
@@ -224,17 +232,21 @@ class BrandModel extends AdminModel
         $id=$data['id'];
         $related_ids=$data['supplier_ids'];
 
-
-        if (!empty($id)||!empty($related_ids) ) {
-
-            foreach( $related_ids as $k => $v){
-                $related_id[]= $v['supplier_id'];
-            }
+        foreach( $related_ids as $k => $v)
+        {
+            $related_id[]= $v['supplier_id'];
+        }
+        //clear empty and 0 item
+        if(!empty($related_id))
+        {
+            $related_id = array_diff($related_id, array(0));
+        }        
+        if(!empty($related_id))
+        {
             $related_id= array_unique($related_id);
-            $related_id= array_diff($related_id,['0']);
-            if(!empty($related_id)){
-            TswrentHelper::saveSupplierBrandRelation($id,$related_id,'brandsupplier');
-            }
+            TswrentHelper::saveSupplierBrandRelation($id,$related_id,'brandsupplier');    
+        }else{
+            TswrentHelper::deleteSupplierBrandRelation($id,'brandsupplier');
         }
         return parent::save($data);
     }

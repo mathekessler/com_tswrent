@@ -96,7 +96,7 @@
 				COM_TSWRENT_CONTACTS
 			</menu>
 			<menu
-				link="option=com_tswrent&amp;view=config&amp;layout=edit";
+				link="option=com_tswrent&amp;view=config&amp;layout=edit"
 				view="config"
 				img="class:tswrent-config"
 				alt="Tswrent/Config"

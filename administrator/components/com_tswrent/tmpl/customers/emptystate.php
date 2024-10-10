@@ -15,7 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 
 $displayData = [
-	'textPrefix' => 'COM_TSWRENT_customerS',
+	'textPrefix' => 'COM_TSWRENT_CUSTOMERS',
 	'formURL' => 'index.php?option=com_tswrent',
 	'helpURL' => 'https://github.com/astridx/boilerplate#readme',
 	'icon' => 'icon-folde customers',

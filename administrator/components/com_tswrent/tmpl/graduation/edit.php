@@ -18,19 +18,14 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 
-$app = Factory::getApplication();
-$input = $app->input;
+Text::script('COM_TSWRENT_GRADUATION_DUPLICATE_ENTRIES');
 
-$assoc = Associations::isEnabled();
 
-$this->ignore_fieldsets = ['item_associations'];
-$this->useCoreUI = true;
-
+/** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 	->useScript('form.validate')
-	->useScript('inlinehelp');
-
+	->useScript('com_tswrent.admin-graduation-edit');
 ?>
 <form action="<?php echo Route::_('index.php?option=com_tswrent&layout=' . $layout . $tmpl . '&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="graduation-form" class="form-validate">
 

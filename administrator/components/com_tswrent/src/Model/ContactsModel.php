@@ -9,7 +9,6 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
-use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 
@@ -33,9 +32,8 @@ class ContactsModel extends ListModel
 	 * @see     \JControllerLegacy
 	 *
 	 * @since   __BUMP_VERSION__
-     * 
 	 */
-	public function __construct($config = array(), MVCFactoryInterface $factory = null)
+	public function __construct($config = [])
 	{
 
 		if (empty($config['filter_fields'])) {
@@ -48,7 +46,7 @@ class ContactsModel extends ListModel
 
 		}
 
-		parent::__construct($config, $factory);
+		parent::__construct($config);
 	}
 
 	/**

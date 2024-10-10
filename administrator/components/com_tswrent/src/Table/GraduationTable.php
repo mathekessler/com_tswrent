@@ -45,67 +45,7 @@ class GraduationTable extends Table
         parent::__construct('#__tswrent_graduations', 'id', $db);
 
     }
-
-    /**
-     * Overloaded check function
-     *
-     * @return  boolean
-     *
-     * @see     Table::check
-     * 
-     * @since   __BUMP_VERSION__
-     * 
-     */
-    public function check()
-    {
-        try {
-            parent::check();
-        } catch (\Exception $e) {
-            $this->setError($e->getMessage());
-
-            return false;
-        }
-
-        // Set name
-        $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
-
-        // Set alias
-        if (trim($this->alias) == '') {
-            $this->alias = $this->title;
-        }
-		$this->alias = ApplicationHelper::stringURLSafe($this->alias);
-
-        if (trim(str_replace('-', '', $this->alias)) == '') {
-            $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
-        }
-
-        // Set created date if not set.
-        if (!(int) $this->created) {
-            $this->created = Factory::getDate()->toSql();
-        }
-
-        return true;
-    }
-
  /**
-     * Overloaded bind function
-     *
-     * @param   mixed  $array   An associative array or object to bind to the \JTable instance.
-     * @param   mixed  $ignore  An optional array or space separated list of properties to ignore while binding.
-     *
-     * @return  boolean  True on success
-     *
-     * @since   __BUMP_VERSION__
-     * 
-     */
-    public function bind($array, $ignore = [])
-    {
-
-        return parent::bind($array, $ignore);
-    }
-
-
-    /**
      * Method to store a row
      *
      * @param   boolean  $updateNulls  True to update fields even if they are null.
@@ -165,5 +105,77 @@ class GraduationTable extends Table
         }
         
         return parent::store($updateNulls);
+	}
+    /**
+     * Overloaded check function
+     *
+     * @return  boolean
+     *
+     * @see     Table::check
+     * 
+     * @since   __BUMP_VERSION__
+     * 
+     */
+    public function check()
+    {
+        try {
+            parent::check();
+        } catch (\Exception $e) {
+            $this->setError($e->getMessage());
+
+            return false;
+        }
+
+        // Set name
+        $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
+
+        // Set alias
+        if (trim($this->alias) == '') {
+            $this->alias = $this->title;
+        }
+		$this->alias = ApplicationHelper::stringURLSafe($this->alias);
+
+        if (trim(str_replace('-', '', $this->alias)) == '') {
+            $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
+        }
+
+        // Set created date if not set.
+        if (!(int) $this->created) {
+            $this->created = Factory::getDate()->toSql();
+        } 
+
+        //check duplicated day entries
+        $graduations = json_decode($this->graduations);
+        $duplicat = $this->duplicatDays($graduations);
+        if (!$duplicat) {
+            $this->setError(Text::_('COM_TSWRENT_WARNING_SAME_GRADUATION'));
+
+            return false;
+        } 
+
+        return true;
     }
+
+    private function duplicatDays($jsonData,){
+        
+        $encounteredDays = array();
+        $duplicateEntries = array();
+
+        foreach ($jsonData as $graduation) {
+            $days = $graduation->days;
+            if (in_array($days, $encounteredDays)) {
+                $duplicateEntries[] = $days;
+            } else {
+                $encounteredDays[] = $days;
+            }
+        }
+        if ($duplicateEntries){
+            
+            return  false;
+        }
+        
+        return true;
+    }
+
+
 }

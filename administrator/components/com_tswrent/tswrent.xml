@@ -1,1 +1,129 @@
-../../../tswrent.xml
+<?xml version="1.0" encoding="utf-8" ?>
+<extension type="component" method="upgrade">
+	<name>COM_TSWRENT</name>
+	<author>TSWEB Mathe Kessler</author>
+	<creationDate>2023-07</creationDate>
+	<copyright>(C) 2005 - 2021 Open Source Matters. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>admin@tonschmiede.ch</authorEmail>
+	<authorUrl>tonschmiede.ch</authorUrl>
+	<version>__BUMP_VERSION__</version>
+	<description>COM_TSWRENT_INSTALLATION_DESCRIPTION</description>
+	
+	<namespace path="src">TSWEB\Component\Tswrent</namespace>
+	
+	<scriptfile>script.php</scriptfile>
+	
+	<media destination="com_tswrent" folder="media/com_tswrent">
+		<folder>images</folder>
+		<folder>css</folder>
+		<folder>js</folder> 
+	</media>
+	
+	<install folder="administrator/components/com_tswrent"> <!-- Runs on install -->
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+	<uninstall folder="administrator/components/com_tswrent"> <!-- Runs on uninstall -->
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+
+	<!-- Back-end files -->
+	<administration>
+		
+		<!-- Menu entries -->
+		<menu img="class:comment">
+			COM_TSWRENT
+
+		</menu>
+		<submenu>
+			<menu 
+				link="option=com_tswrent" 
+				img="class:tswrent-cat"
+				alt="Tswrent/Products"
+				>
+				COM_TSWRENT_PRODUCTS
+			</menu>
+			<menu 
+				link="option=com_categories&amp;extension=com_tswrent"
+				view="categories"
+				img="class:tswrent-cat"
+				alt="Tswrent/Categories"
+				>
+				JCATEGORY
+			</menu>		
+			<menu
+				link="option=com_tswrent&amp;view=orders"
+				view="orders"
+				img="class:tswrent-orders"
+				alt="Tswrent/Orders"
+				>
+				COM_TSWRENT_ORDERS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=brands"
+				view="brands"
+				img="class:tswrent-brands"
+				alt="Tswrent/Brands"
+				>
+				COM_TSWRENT_BRANDS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=suppliers"
+				view="suppliers"
+				img="class:tswrent-suppliers"
+				alt="Tswrent/Supplyers"
+				>
+				COM_TSWRENT_SUPPLIERS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=customers"
+				view="customers"
+				img="class:tswrent-customers"
+				alt="Tswrent/Customers"
+				>
+				COM_TSWRENT_CUSTOMERS
+			</menu>	
+			<menu
+				link="option=com_tswrent&amp;view=contacts"
+				view="contacts"
+				img="class:tswrent-contacts"
+				alt="Tswrent/Contacts"
+				>
+				COM_TSWRENT_CONTACTS
+			</menu>
+			<menu
+				link="option=com_tswrent&amp;view=config&amp;layout=edit";
+				view="config"
+				img="class:tswrent-config"
+				alt="Tswrent/Config"
+				>
+				COM_TSWRENT_CONFIG
+			</menu>
+		</submenu>
+		
+		<dashboards>
+				<dashboard title="COM_EXAMPLE_DASHBOARD_TITLE" icon="icon-lock">tswrent</dashboard>
+		</dashboards>
+		<files folder="administrator/components/com_tswrent">
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<folder>forms</folder>
+			<folder>presets</folder>
+			<folder>services</folder>
+			<folder>sql</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+
+		
+		<languages folder="administrator/language">
+			<language tag="en-GB">en-GB/com_tswrent.ini</language>
+			<language tag="en-GB">en-GB/com_tswrent.sys.ini</language>
+		</languages>
+
+	</administration>
+</extension>

@@ -9,6 +9,8 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 use TSWEB\Component\Tswrent\Administrator\Helper\TswrentHelper;
@@ -35,9 +37,9 @@ class BrandsModel extends ListModel
 	 * @since   __BUMP_VERSION__
 	 * 
 	 */
-	public function __construct($config = [])
-	{
-		if (empty($config['filter_fields'])) {
+	public function __construct($config = [], MVCFactoryInterface $factory = null)
+    {
+			if (empty($config['filter_fields'])) {
 			$config['filter_fields'] = array(
 				'id', 'a.id',
 				'title', 'a.title', 'name',
@@ -226,6 +228,9 @@ class BrandsModel extends ListModel
 	 */
 	protected function populateState($ordering = 'a.title', $direction = 'asc')
 	{	
+		// Load the parameters.
+        $this->setState('params', ComponentHelper::getParams('com_tswrent'));
+
 		// List state information.
 		parent::populateState($ordering, $direction);
 

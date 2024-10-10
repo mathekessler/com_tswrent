@@ -36,13 +36,19 @@
 				<fieldset>
 					<field 
 						name="duration"
-						type="text"
+						type="number"
+						step="1"
+						required="true"
+						onchange= "calcDays(this.id)"
 						label="COM_TSWRENT_RENT_DURATION"
+
 					/>
+					
 					<field 
 						name="unit" 
 						type="list"
 						label="COM_TSWRENT_FIELD_UNIT"
+						onchange="calcDays(this.id)"
 						validate="options"	
 						>
 						<option value="1">COM_TSWRENT_PER_DAY</option>
@@ -54,6 +60,10 @@
 						label="COM_TSWRENT_FIELD_FACTOR"
 						step="0.5"
 						required="true"
+					/>
+					<field 
+						name="days"
+						type="hidden"
 					/>
 				</fieldset>
 			</form>

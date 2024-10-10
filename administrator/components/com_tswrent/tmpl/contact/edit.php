@@ -48,7 +48,7 @@ $wa->useScript('keepalive')
 				</div>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tswrent', empty($this->item->id) ? Text::_('COM_TSWRENT_FIELDSET_TSWRENT') : Text::sprintf('COM_TSWRENT_FIELDSET_TSWRENT',$factory_name)); ?>
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tswrent', empty($this->item->id) ? Text::sprintf('COM_TSWRENT_FIELDSET_TSWRENT',$factory_name) : Text::sprintf('COM_TSWRENT_FIELDSET_TSWRENT',$factory_name)); ?>
 			<div class="row">
 					<div class="col-md-12">
 						<fieldset id="fieldset-tswrentdata" class="options-form">

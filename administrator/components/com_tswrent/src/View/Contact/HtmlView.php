@@ -10,7 +10,6 @@
 namespace TSWEB\Component\Tswrent\Administrator\View\Contact;
 
 use Exception;
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
@@ -37,6 +36,7 @@ class HtmlView extends BaseHtmlView
 	 * The \JForm object
 	 *
 	 * @var  \JForm
+	 * @since  __BUMP_VERSION__
 	 */
 	protected $form;
 
@@ -44,6 +44,7 @@ class HtmlView extends BaseHtmlView
 	 * The active item
 	 *
 	 * @var  object
+	 * @since  __BUMP_VERSION__
 	 */
 	protected $item;
 	
@@ -51,6 +52,7 @@ class HtmlView extends BaseHtmlView
 	 * The model state
 	 *
 	 * @var    object
+	 * @since  __BUMP_VERSION__
 	 */
 	protected $state;
 
@@ -75,7 +77,7 @@ class HtmlView extends BaseHtmlView
 	 */
 	public function display($tpl = null): void
 	{
-        /** @var SupplierModel $model */
+        /** @var ContactModel $model */
         $model       = $this->getModel();
         $this->form  = $model->getForm();
         $this->item  = $model->getItem();
@@ -87,11 +89,12 @@ class HtmlView extends BaseHtmlView
 		{
 			throw new GenericDataException(implode("\n", $errors), 500);
 		}
-
-
-        $this->addToolbar();
-
-
+		if ($this->getLayout() == 'edit') {
+			$this->addToolbar();
+		} 
+        else{
+        $this->addEditToolbar();
+        }
 		parent::display($tpl);
 	}
 
@@ -148,13 +151,41 @@ class HtmlView extends BaseHtmlView
         } else {
             $toolbar->cancel('contact.cancel');
 
-            if (ComponentHelper::isEnabled('com_contenthistory') && $this->state->params->get('save_history', 0) && $canDo->get('core.edit')) {
-                $toolbar->versions('com_tswrent.contact', $this->item->id);
-            }
         }
 
 
         $toolbar->divider();
         $toolbar->help('Banners:_New_or_Edit_Contact');
+	}
+
+	/**
+	 * Add the page title and toolbar.
+	 *
+	 * @return  void
+	 *
+	 * @since   __BUMP_VERSION__
+     * 
+	 */
+	protected function addEditToolbar(): void
+	{
+
+        $user       = $this->getCurrentUser();
+        $userId     = $user->id;
+        $isNew      = ($this->item->id == 0);
+        $checkedOut = !(\is_null($this->item->checked_out) || $this->item->checked_out == $userId);
+        $canDo      = $this->canDo;
+        $toolbar    = Toolbar::getInstance();
+
+		ToolbarHelper::title(
+			Text::_('COM_TSWRENT_MANAGER_CONTACT_EDIT'),
+			'bookmark tswrent-contacts'
+		);
+
+        // If not checked out, can save the item.
+        if (!$checkedOut && ($canDo->get('core.edit') || \count($user->getAuthorisedCategories('com_tswrent', 'core.create')) > 0)) {
+            $toolbar->edit('contact.edit2');
+            $toolbar->cancel('contact.cancel', 'JTOOLBAR_CANCEL');
+        }
+
 	}
 }

@@ -22,32 +22,6 @@ use Joomla\CMS\MVC\Controller\AdminController;
  */
 class ContactsController extends AdminController
 {
-	/**
-     * The prefix to use with controller messages.
-     *
-     * @var    string
-	 * 
-     * @since  __BUMP_VERSION__
-    */
-    protected $text_prefix = 'COM_TSWRENT_CONTACTS';
-
-	/**
-	 * Constructor.
-	 *
-	 * @param   array                $config   An optional associative array of configuration settings.
-	 * Recognized key values include 'name', 'default_task', 'model_path', and
-	 * 'view_path' (this list is not meant to be comprehensive).
-	 * @param   MVCFactoryInterface  $factory  The factory.
-	 * @param   CMSApplication       $app      The JApplication for the dispatcher
-	 * @param   Input                $input    Input
-	 *
-	 * @since   __BUMP_VERSION__
-	 */
-	public function __construct($config = [], MVCFactoryInterface $factory = null, $app = null, $input = null)
-	{
-		parent::__construct($config, $factory, $app, $input);
-
-	}
 
 	/**
 	 * Proxy for getModel.
@@ -60,7 +34,7 @@ class ContactsController extends AdminController
 	 *
 	 * @since   __BUMP_VERSION__
 	 */
-	public function getModel($name = 'contact', $prefix = 'Administrator', $config = ['ignore_request' => true])
+	public function getModel($name = 'Contact', $prefix = 'Administrator', $config = ['ignore_request' => true])
 	{
 		return parent::getModel($name, $prefix, $config);
 	}

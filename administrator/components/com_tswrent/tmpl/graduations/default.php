@@ -61,9 +61,6 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                 <th scope="col">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_TITLE', 'a.title', $listDirn, $listOrder); ?>
                                 </th>
-                                <th scope="col" class="w-10 d-none d-md-table-cell">
-                                    <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_BRAND', 'brand_title', $listDirn, $listOrder); ?>
-                                </th>
                                 <th scope="col" class="w-5 d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
                                 </th>
@@ -97,14 +94,8 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                             <div class="small break-word">
                                                 <?php echo Text::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($item->alias)); ?>
                                             </div>
-                                            <div class="small">
-                                                <?php echo Text::_('JCATEGORY') . ': ' . $this->escape($item->category_title); ?>
-                                            </div>
                                         </div>
                                     </th>
-                                    <td class="small d-none d-md-table-cell">
-                                        <?php echo $item->brand_title; ?>
-                                    </td>
                                     <td class="d-none d-md-table-cell">
                                         <?php echo $item->id; ?>
                                     </td>

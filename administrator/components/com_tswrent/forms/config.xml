@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<form addfieldprefix="TSWEB\Component\Tswrent\Administrator\Field"> 
+    <fieldset name="company_detail">
+        <fields  name="company">     
+            <field 
+                name="title" 
+                type="text"
+                size="40"
+                label="JGLOBAL_TITLE"
+                required="true"
+            />
+
+            <fieldset name="details">
+                <field 
+                    name="description"
+                    type="textarea"
+                    label="COM_TSWRENT_FIELD_DESCRIPTION"
+                />
+                <field 
+                    name="address" 
+                    type="text" 		
+                    label="COM_TSWRENT_FIELD_ADDRESS" 
+                />
+                <field 
+                    name="city" 
+                    type="text"			
+                    label="COM_TSWRENT_FIELD_CITY" 
+                />
+                <field 
+                    name="postalcode" 
+                    type="text"	
+                    default='0000'		
+                    label="COM_TSWRENT_FIELD_POSTALCODE" 
+                />
+                <field 
+                    name="telephone" 
+                    type="text" 	
+                    label="COM_TSWRENT_FIELD_TELEPHONE" 
+                />
+                <field 
+                    name="mobile" 
+                    type="text" 
+                    label="COM_TSWRENT_FIELD_MOBILE" 
+                />
+                <field 
+                    name="webpage" 
+                    type="url" 
+                    default="http://www.example.com" 
+                    label="COM_TSWRENT_FIELD_WEBPAGE"  
+                    filter="url"
+                    validate="url"
+                />
+                <field 
+                    name="email_to" 
+                    type="email"
+                    label="JGLOBAL_EMAIL"
+                    size="30"
+                    class="inputbox"
+                    validate="email" 
+                />
+            </fieldset> 
+        </fields>
+    </fieldset>
+</form>

@@ -24,7 +24,7 @@ use Joomla\CMS\Language\Text;
  * @since __BUMP_VERSION__
  * 
  */
-class SupplierField extends ListField
+class GraduationField extends ListField
 {
     /**
      * The form field type.
@@ -33,7 +33,7 @@ class SupplierField extends ListField
      * 
      * @since  __BUMP_VERSION__
      */
-    protected $type = 'Supplier';
+    protected $type = 'Graduation';
 
 	/**
 	 * Create Input
@@ -60,7 +60,7 @@ class SupplierField extends ListField
                     $db->quoteName('a.title', 'text'),
                 ]
             )
-            ->from($db->quoteName('#__tswrent_suppliers', 'a'))
+            ->from($db->quoteName('#__tswrent_graduations', 'a'))
             ->where($db->quoteName('a.published') . ' = 1')
             ->order($db->quoteName('a.title'));
 
@@ -73,10 +73,7 @@ class SupplierField extends ListField
         } catch (\RuntimeException $e) {
             Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
         }
-
-
-        array_unshift($options, HTMLHelper::_('select.option', '', Text::_('COM_TSWRENT_SELECT')));
-
+        array_unshift($options, HTMLHelper::_('select.option', "0", Text::_('COM_TSWRENT_SELECT')));
         // Merge any additional options in the XML definition.
         $options = array_merge(parent::getOptions(), $options);
 

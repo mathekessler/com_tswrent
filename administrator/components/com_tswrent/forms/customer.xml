@@ -54,8 +54,9 @@
 			name="webpage" 
 			type="url" 
 			default="http://www.example.com" 
-			label="COM_TSWRENT_FIELD_WEBPAGE" 
-			size="10" 
+			label="COM_TSWRENT_FIELD_WEBPAGE"  
+			filter="url"
+			validate="url"
 		/>
 		<field 
 			name="email_to" 

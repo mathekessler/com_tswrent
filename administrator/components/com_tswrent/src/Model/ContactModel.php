@@ -191,16 +191,14 @@ class ContactModel extends AdminModel
      */
     protected function loadFormData()
     {
-        $app  = Factory::getApplication();
-        
         // Check the session for previously entered form data.
+        $app  = Factory::getApplication();
         $data = $app->getUserState('com_tswrent.edit.contact.data', []);
 
         if (empty($data)) {
             $data = $this->getItem();
 
         }
-        $this->preprocessData('com_tswrent.contact', $data);
 
         return $data;
     }
@@ -223,28 +221,11 @@ class ContactModel extends AdminModel
         
         if (!empty($item->id)) {
             $id = $item->id;
-            $item->supplier_ids = ContactHelper::getInputSupplierRelation($id);
-            $item->customer_ids = ContactHelper::getInputCustomerRelation($id);
+            $item->supplier_ids = ContactHelper::getInputContactRelation($id, 'contactsupplier');
+            $item->customer_ids = ContactHelper::getInputContactRelation($id,'contactcustomer');
             $item->tswrentemployee = ContactHelper::getInputTswrentemployeeRelation($id);
         }
         return $item;
-    }
-
-    /**
-     * A protected method to get a set of ordering conditions.
-     *
-     * @param   Table  $table  A record object.
-     *
-     * @return  array  An array of conditions to add to ordering queries.
-     *
-     *  @since   __BUMP_VERSION__
-     * 
-     */
-    protected function getReorderConditions($table)
-    {
-        $condition   = array();
-		$condition[] = 'catid = ' . (int) $table->catid;
-        return $condition;
     }
 
     /**
@@ -292,6 +273,7 @@ class ContactModel extends AdminModel
     public function save($data)
     {   
             $id=$data['id'];
+
             //Save Contact/Supplier relation 
             if(!empty($data['supplier_ids'])){
                 $supplier_ids=$data['supplier_ids'];
@@ -308,7 +290,8 @@ class ContactModel extends AdminModel
                     $supplier_id= array_unique($supplier_id);
                 
                     ContactHelper::saveContactRelation($id,$supplier_id,'contactsupplier');
-                }else{
+                }else
+                {
                     ContactHelper::deleteContactRelation($id,'contactsupplier');
                 }
             } else{ContactHelper::deleteContactRelation($id,'contactsupplier');}  
@@ -334,7 +317,7 @@ class ContactModel extends AdminModel
                 }
             }else{ContactHelper::deleteContactRelation($id,'contactcustomer');}
                         
-            //Save Contact/Customer relation 
+            //Save Contact/tswrent relation 
             if(!empty($data['tswrentemployee'])){
                 $customer_id=['1'];               
                 ContactHelper::saveContactRelation($id,$customer_id,'tswrent');
@@ -345,4 +328,67 @@ class ContactModel extends AdminModel
 
         return parent::save($data);
     }
+
+
+    /**
+     * Method to remove customer from contact.
+     *
+     * @param   integer $id  Contact ID.
+     * 
+     * @param   integer $customer_id  Customer ID to remove.
+     *
+     * @return  boolean  True on success.
+     *
+     *  @since   __BUMP_VERSION__
+     * 
+     */
+    public function removecustomer($id,$customer_id)
+    {
+        $db   = Factory::getContainer()->get('DatabaseDriver');
+			// get previous entries
+			$query = $db->getQuery(true);
+			$query->delete($db->quoteName('#__tswrent_contact_relation'));
+			$query->where('customer_id = ' . $customer_id);
+			$query->where('contact_id =' .$id);
+			$db->setQuery($query);
+
+            try {
+                $db->execute();
+            } catch (\RuntimeException $e) {
+                $this->setError($e->getMessage());
+    
+                return false;
+            }
+        }
+
+    /**
+     * Method to remove supplier from contact.
+     *
+     * @param   integer $id  Contact ID.
+     * 
+     * @param   integer $supplier_id  Supplier ID to remove.
+     *
+     * @return  boolean  True on success.
+     *
+     *  @since   __BUMP_VERSION__
+     * 
+     */
+    public function removesupplier($id,$supplier_id)
+    {
+        $db   = Factory::getContainer()->get('DatabaseDriver');
+			// get previous entries
+			$query = $db->getQuery(true);
+			$query->delete($db->quoteName('#__tswrent_contact_relation'));
+			$query->where('supplier_id = ' . $supplier_id);
+			$query->where('contact_id =' .$id);
+			$db->setQuery($query);
+
+            try {
+                $db->execute();
+            } catch (\RuntimeException $e) {
+                $this->setError($e->getMessage());
+    
+                return false;
+            }
+        }
 }

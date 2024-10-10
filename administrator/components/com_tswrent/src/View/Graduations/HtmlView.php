@@ -11,12 +11,10 @@ namespace TSWEB\Component\Tswrent\Administrator\View\Graduations;
 
 use Exception;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\ContentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Pagination\Pagination;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use TSWEB\Component\Tswrent\Administrator\Model\GraduationsModel;
@@ -110,8 +108,11 @@ class HtmlView extends BaseHtmlView
             throw new GenericDataException(implode("\n", $errors), 500);
         }
         
-        $this->addToolbar();
+        if (!count($this->items) && $this->get('IsEmptyState')) {
+			$this->setLayout('emptystate');
+		}
 
+		$this->addToolbar();
         parent::display($tpl);
     }
 
@@ -123,7 +124,7 @@ class HtmlView extends BaseHtmlView
      * @since   __BUMP_VERSION__
      * 
      */
-    protected function addToolbar(): void
+    protected function addToolbar()
     {
         $canDo   = ContentHelper::getActions('com_tswrent', 'category', $this->state->get('filter.category_id'));
         $user    = Factory::getApplication()->getIdentity();

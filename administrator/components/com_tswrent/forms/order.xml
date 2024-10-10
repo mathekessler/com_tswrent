@@ -28,10 +28,26 @@
 		<field 
 			name="contact"
 			type="contact"
-			label="JFIELD_ALIAS_LABEL"
-			description="JFIELD_ALIAS_DESC"
-			hint="JFIELD_ALIAS_PLACEHOLDER"
+			contacttype= "tswrent"
+			label="COM_TSWRENT_FIELD_CONTACTS"
 		/>
+		<field 
+			name="customer"
+			type="customer"
+			onchange='c_contact()'
+			label="COM_TSWRENT_FIELD_ORDER_CUSTOMER"
+		/>
+		<field 
+			name="c_contact"
+			type="contact"
+			contacttype= "order"
+			label="COM_TSWRENT_CUSTOMER_CONTACTS"
+			required="true"
+			showon= 'customer!:0'
+		>
+		<option value="0">COM_TSWRENT_ORDER_CUSTOMER_FIRST_SELECT</option>
+		</field>
+		
 		<fields name = "event_address">
 			<fieldset>
 				<field 
@@ -56,38 +72,38 @@
 			name="startdate"
 			type="calendar"
 			label="COM_TSWRENT_START_DATE"
-			class="input-medium" 
-			required="true" 
-			filter="user_utc" 
-			format="%Y-%m-%d %H:%I"
-			singleheader="true" 
-			showtime="true" 
-			timeformat="24" 
-			weeknumbers="true"
-			filltable="true" 
-			maxyear="5" 
+			translateformat="true"
+			showtime="true"
+			filter="user_utc"
+			onchange='calcDays()'
 		/>		
 		<field
 			name="enddate"
 			type="calendar"
 			label="COM_TSWRENT_END_DATE"
-			class="input-medium" 
-			required="true" 
-			filter="user_utc" 
-			format="%Y-%m-%d %H:%I"
-			singleheader="true" 
-			showtime="true" 
-			timeformat="24" 
-			weeknumbers="true"
-			filltable="true" 
-			maxyear="5" 
+			translateformat="true"
+			showtime="true"
+			filter="user_utc"
+			onchange='calcDays()'
+		/>
+		<field
+			name="days"
+			type="hidden"
+			readonly="true"
+			label="COM_TSWRENT_FIELD_DAYS"
+			onchange='calcHours()'
+		/>
+		<field
+			name="hours"
+			type="hidden"
+			readonly="true"
+			label="COM_TSWRENT_FIELD_HOURS"
 		/>
 
-
 		<field
-			name="published"
+			name="orderstate"
 			type="list"
-			label="COM_TSWRENT_FIELD_ORDER_STATUS"
+			label="COM_TSWRENT_FIELD_ORDER_STATE"
 			default="0"
 			validate="options"
 			>
@@ -98,7 +114,67 @@
 
 		</field>
 	</fieldset>
-
+	<fieldset name="products">
+		<field 
+			name="graduation"
+			type="graduation"
+			onload='getFactor()'
+			onchange='getFactor()'
+			label="COM_TSWRENT_FIELD_GRADUATION"
+		/>
+		<field
+			name="factor"
+			type="text"
+			readonly="true"
+			class="readonly"
+			onchange='calcPrice()'
+			label="COM_TSWRENT_FIELD_GRADUATION_FACTOR"
+		/>
+					<field 
+				name="product_title"
+				type="products"
+				label="COM_TSWRENT_TITLE"	
+			/>
+			<field 
+				name="id"
+				type="hidden"
+				label="COM_TSWRENT_TITLE"	
+			/>
+			<field 
+				name="description"
+				type="text"
+				label="COM_TSWRENT_DESCRIPTION"
+			/>
+			<field 
+				name="price"
+				type="text"
+				readonly= "true"
+				label="COM_TSWRENT_PRICE"
+			/>		
+			<field
+				name="unit"
+				type= "hidden"
+				label="COM_TSWRENT_UNIT"
+			/>
+			<field
+				name="stock"
+				type= "stock"
+				label="COM_TSWRENT_STOCK"
+			/>
+			<field
+				name="discount"
+				type="number"
+				default="0"
+				onchange="calcPrice()"
+				step="0.5"
+			/>
+			<factor
+				name="price_total"
+				type="text"
+				readonly="true"
+			/>
+	</fieldset>
+	
 	<fieldset name="publish">
 
 		<field 

@@ -100,8 +100,7 @@
 				<fieldset>
 					<field 
 					name="customer_id" 
-					type="customer"
-					validate="options"	
+					type="customers"
 					/>
 				</fieldset>
 			</form>
@@ -115,14 +114,14 @@
 			label="COM_TSWRENT_FIELD_SUPPLIER"
 			default=""
 			multiple="true"
-			layout="joomla.form.field.subform.repeatable-table"
+			layout="joomla.form.field.subform.repeatable"
 			>
 			<form>
 				<fieldset>
 					<field 
 					name="supplier_id" 
-					type="supplier"
-					validate="options"	
+					type="suppliers"
+
 					/>
 				</fieldset>
 			</form>

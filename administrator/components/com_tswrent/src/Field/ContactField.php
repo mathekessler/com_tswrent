@@ -53,17 +53,53 @@ class ContactField extends ListField
 	protected function getOptions()
 	{
 		$db    = Factory::getDbo();
-        $query = $db->getQuery(true)
-            ->select(
-                [
-                    $db->quoteName('a.id', 'value'),
-                    $db->quoteName('a.title', 'text'),
-                ]
-            )
-            ->from($db->quoteName('#__tswrent_contacts', 'a'))
-            ->where($db->quoteName('a.published') . ' = 1')
-            ->order($db->quoteName('a.title'));
+       $contacttype = $this->element['contacttype'];
+        switch($contacttype){
+            case "tswrent";
+            $query = $db->getQuery(true)
+                    ->select(
+                        [
+                            $db->quoteName('a.id', 'value'),
+                            $db->quoteName('a.title', 'text'),
+                            $db->quoteName('b.tswrent')
+                        ]
+                    )
+                    ->from($db->quoteName('#__tswrent_contacts', 'a'))
+                    ->join('inner',$db->quoteName('#__tswrent_contact_relation', 'b').'on'.$db->quoteName('b.tswrent').'!= 0 and '.$db->quoteName('b.contact_id').'='.$db->quoteName('a.id') )
+                    ->where($db->quoteName('a.published') . ' = 1')
+                    ->order($db->quoteName('a.title'));
+            
+            break;
+            case "order";
+            $query = $db->getQuery(true)
+                    ->select(
+                        [
+                            $db->quoteName('a.id', 'value'),
+                            $db->quoteName('a.title', 'text'),
+                        ]
+                    )
+                    ->from($db->quoteName('#__tswrent_contacts', 'a'))
+                    ->join('inner',$db->quoteName('#__tswrent_contact_relation', 'b').'on'.$db->quoteName('b.customer_id').'!= 0 and '.$db->quoteName('b.contact_id').'='.$db->quoteName('a.id') )
+                    ->join('inner',$db->quoteName('#__tswrent_orders', 'o').'on'.$db->quoteName('o.customer').'='.$db->quoteName('b.customer_id') )
+                    ->where($db->quoteName('a.published') . ' = 1')
+                    ->order($db->quoteName('a.title'));
+            
+            break;
 
+             default:
+                $query = $db->getQuery(true)
+                    ->select(
+                        [
+                            $db->quoteName('a.id', 'value'),
+                            $db->quoteName('a.title', 'text'),
+                        ]
+                    )
+                    ->from($db->quoteName('#__tswrent_contacts', 'a'))
+                    ->where($db->quoteName('a.published') . ' = 1')
+                    ->order($db->quoteName('a.title'));
+            break; 
+        }
+        
         // Get the options.
         $db->setQuery($query);
 
@@ -75,7 +111,7 @@ class ContactField extends ListField
         }
 
 
-        array_unshift($options, HTMLHelper::_('select.option', "", Text::_('COM_TSWRENT_SELECT')));
+        array_unshift($options, HTMLHelper::_('select.option', "0", Text::_('COM_TSWRENT_SELECT')));
 
         // Merge any additional options in the XML definition.
         $options = array_merge(parent::getOptions(), $options);
