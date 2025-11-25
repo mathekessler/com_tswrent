@@ -1,12 +1,15 @@
-Order
-    Products
-        product -->  Modal Select
-        Description--> Text
-        price--> Text Read only
-        Stock --> List with product stock at first --> later check how many are free at this days
-        discount --> Text default 0, onchange --> calculation of price
-        total price--> text readonly 
+Config-->
+    Währung --> 
+        Hauptwährung
+            Additional währung --> Kurs zur hauptwährung
+        de-DE / de-CH
+    MwSt -->
+            MwSt Sätze definieren (19 / 8.5 ect.)
+            Standart definieren
 
+Order -->
+    Währung ändern
+    MwSt Satz 
 
-
-Supplier/Customer/Brand -> logo image
+Supplier/Customer/Brand -->
+    logo image

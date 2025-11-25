@@ -7,21 +7,5 @@
     "projectManager.git.baseFolders": [
         "L:\\\\"
     ],
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
-            "previewLimit": 50,
-            "server": "jj3ch1.mysql.db.hostpoint.ch",
-            "port": 3306,
-            "driver": "MariaDB",
-            "name": "Tonschmiede",
-            "group": "jj3ch1",
-            "password": "R197aXKAo?!FL71eP4Xs",
-            "username": "jj3ch1_jj3ch1",
-            "database": "jj3ch1_tonschmiede"
-        }
-    ]
+
 }
