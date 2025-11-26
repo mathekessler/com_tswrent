@@ -1,0 +1,4 @@
+/* Subform Label bei order ausblenen */
+.control-group:has(#jform_products-lbl) > .control-label {
+    display: none;
+}

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form addfieldprefix="TSWEB\Component\Tswrent\Administrator\Field">
+	
+	<fieldset name="title_alias">
+		<field 
+			name="title" 
+			type="text"
+			size="40"
+			label="JGLOBAL_TITLE"
+			required="true"
+		/>
+		<field 
+			name="alias"
+			type="text"
+			label="JFIELD_ALIAS_LABEL"
+			description="JFIELD_ALIAS_DESC"
+			hint="JFIELD_ALIAS_PLACEHOLDER"
+		/>
+	</fieldset>
+
+	<fieldset name="details">
+
+		<field 
+			name="description"
+			type="textarea"
+			label="COM_TSWRENT_FIELD_DESCRIPTION"
+		/>
+		<field 
+			name="contact_id"
+			type="contact"
+			contacttype= "tswrent"
+			required="true"
+			label="COM_TSWRENT_FIELD_CONTACTS"
+		/>
+		<field 
+			name="customer_id"
+			type="customers"
+			required="true"
+			onchange='c_contact(this)'
+			label="COM_TSWRENT_FIELD_ORDER_CUSTOMER"
+		/>
+		<field 
+			name="c_contact_id"
+			type="contact"
+			contacttype="order"
+			label="COM_TSWRENT_CUSTOMER_CONTACTS"
+			required="true"
+			showon= "customer!:0"
+		>
+		<option value="0">COM_TSWRENT_OPTION_SELECT_CUSTOMER</option>
+		</field>
+		
+		<fieldset>
+			<field 
+			name="venue_name" 
+			type="text"
+			size="40"
+			label="COM_TSWRENT_FIELD_VENUE_NAME"
+			required="true"
+		/>
+			<field 
+				name="address" 
+				type="text" 
+				required="true"		
+				label="COM_TSWRENT_FIELD_ADDRESS" 
+			/>
+			<field 
+				name="city" 
+				type="text"
+				required="true"			
+				label="COM_TSWRENT_FIELD_CITY" 
+			/>
+			<field 
+				name="postalcode" 
+				type="text"	
+				default='0000'
+				required="true"		
+				label="COM_TSWRENT_FIELD_POSTALCODE" 
+			/>
+		</fieldset>
+		<field
+			name="startdate"
+			type="calendar"
+			label="COM_TSWRENT_START_DATE"
+			translateformat="true"
+			showtime="true"
+			filter="user_utc"
+			onchange='calcDays()'
+			required="true"
+		/>		
+		<field
+			name="enddate"
+			type="calendar"
+			label="COM_TSWRENT_END_DATE"
+			translateformat="true"
+			showtime="true"
+			filter="user_utc"
+			onchange='calcDays()'
+			required="true"
+		/>
+		<field
+			name="days"
+			type="hidden"
+			readonly="true"
+			label="COM_TSWRENT_FIELD_DAYS"
+			onchange='calcHours()'
+		/>
+		<field
+			name="hours"
+			type="hidden"
+			readonly="true"
+			label="COM_TSWRENT_FIELD_HOURS"
+		/>
+
+		<field
+			name="orderstate"
+			type="list"
+			label="COM_TSWRENT_FIELD_ORDER_STATE"
+			default="0"
+			validate="options"
+			>
+			<option value="0">COM_TSWRENT_ORDER_STATUS_OFFER</option>
+			<option value="1">COM_TSWRENT_ORDER_STATUS_ORDERED</option>
+			<option value="2">COM_TSWRENT_ORDER_STATUS_INVOICE</option>
+			<option value="3">COM_TSWRENT_ORDER_CLOSED</option>
+
+		</field>
+	</fieldset>
+	
+	<fieldset name="graduation_factor" label="COM_TSWRENT_GROUP_LABEL_GRADUATION_FACTOR">
+		<field 
+			name="graduation_id"
+			type="graduation"
+			required="true"
+			default="1"
+			onload='getFactor()'
+			onchange='getFactor()'
+			label="COM_TSWRENT_FIELD_GRADUATION"
+		/>
+		<field
+			name="factor"
+			type="text"
+			readonly="true"
+			class="readonly"
+			onchange='updateAllPrices'
+			label="COM_TSWRENT_FIELD_GRADUATION_FACTOR"
+		/>
+
+
+		
+	</fieldset>
+	<fieldset name="order_products">
+		<field 
+				name="product_title"
+				type="text"
+				label="JGLOBAL_TITLE"	
+		/>
+		<field 
+			name="product_description"
+			type="textarea"
+			label="COM_TSWRENT_FIELD_DESCRIPTION"
+		/>
+		<field 
+			name="product_price"
+			type="text"
+			readonly= "true"
+			label="COM_TSWRENT_FIELD_PRICE"
+		/>		
+		<field
+			name="reserved_quantity"
+			type= "stock"
+			default="0"
+			min="0"
+			step="1"
+			onchange="calcPrice(this)"
+			label="COM_TSWRENT_STOCK"
+		/>
+		<field
+			name="productdiscount"
+			type="number"
+			default="0"
+			min="0"
+			max="100"
+			onchange="calcPrice(this)"
+			step="0.5"
+			label="COM_TSWRENT_FIELD_DISCOUNT"
+		/>
+		<field
+			name="product_price_total"
+			type="text"
+			readonly="true"
+			onchange="updateOrderTotal()"
+			label="COM_TSWRENT_TOTAL_PRICE"
+		/>
+		<field
+			name="orderdiscount"
+			type="number"
+			default="0"
+			min="0"
+			max="100"
+			onchange="updateOrderTotal()"
+			step="0.5"
+			label="COM_TSWRENT_ORDERDISCOUNT"
+		/>
+		<field
+			name="order_total_price"
+			type="text"
+			readonly="true"
+			label="COM_TSWRENT_TOTAL_PRICE"
+		/>
+	</fieldset>
+	
+	<fieldset name="publish">
+
+		<field 
+			name="id" 
+			type="text"
+			default="0"
+			readonly="true"
+			class="readonly"
+			label="JGLOBAL_FIELD_ID_LABEL"
+		/>
+		<field
+			name="created_by"
+			type="user"
+			label="JGLOBAL_FIELD_CREATED_BY_LABEL"
+			validate="UserId"
+		/>
+
+		<field
+			name="created_by_alias"
+			type="text"
+			label="JGLOBAL_FIELD_CREATED_BY_ALIAS_LABEL"
+		/>
+
+		<field
+			name="created"
+			type="calendar"
+			label="JGLOBAL_FIELD_CREATED_LABEL"
+			translateformat="true"
+			showtime="true"
+			filter="user_utc"
+		/>
+
+		<field
+			name="modified"
+			type="calendar"
+			label="JGLOBAL_FIELD_MODIFIED_LABEL"
+			class="readonly"
+			readonly="true"
+			translateformat="true"
+			showtime="true"
+			filter="user_utc"
+		/>
+
+		<field
+			name="modified_by"
+			type="user"
+			label="JGLOBAL_FIELD_MODIFIED_BY_LABEL"
+			class="readonly"
+			readonly="true"
+			filter="unset"
+			validate="UserId"
+		/>
+
+
+		<field
+			name="ordering"
+			type="ordering"
+			label="JFIELD_ORDERING_LABEL"
+			content_type="com_contact.contact"
+		/>
+
+
+	</fieldset>
+
+</form>

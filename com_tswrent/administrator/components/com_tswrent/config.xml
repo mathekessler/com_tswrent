@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<fieldset 		name="company-details"	label="COM_TSWRENT_FIELDSET_COMPANY_DETAILS">
+		<fieldset name="address_details">
+			<field 
+				name="company_title"
+				type="text"
+				label="COM_TSWRENT_FIELD_TITLE"
+			/>	
+
+			<field 
+				name="company_address" 
+				type="text" 		
+				label="COM_TSWRENT_FIELD_ADDRESS" 
+			/>
+			<field 
+				name="company_city" 
+				type="text"			
+				label="COM_TSWRENT_FIELD_CITY" 
+			/>
+			<field 
+				name="company_postalcode" 
+				type="text"	
+				default='0000'		
+				label="COM_TSWRENT_FIELD_POSTALCODE" 
+			/>
+
+			<field 
+				name="company_telephone" 
+				type="text" 	
+				label="COM_TSWRENT_FIELD_TELEPHONE" 
+			/>
+			<field 
+				name="company_email" 
+				type="email" 
+				default=""
+				label="COM_TSWRENT_FIELD_EMAIL" 
+			/>
+			<field 
+				name="company_webpage" 
+				type="url" 
+				default="http://www.example.com" 
+				label="COM_TSWRENT_FIELD_WEBPAGE" 
+				size="10" 
+			/>
+			<field
+			name="company_logo"
+			type="media"
+			schemes="http,https,ftp,ftps,data,file"
+			validate="url"
+			relative="true"
+			label="COM_TSWRENT_FIELD_IMAGE_LABEL"
+			default=""
+		/>
+		</fieldset>
+		<fieldset name="bank-connection">
+			<field 
+				name="company_bankname" 
+				type="text" 
+				default='Name of the Bank'		
+				label="COM_TSWRENT_FIELD_BANKNAME" 
+			/>
+			<field 
+				name="company_bankaccount_owner" 
+				type="text"	
+				default='Name of the Account Owner'		
+				label="COM_TSWRENT_FIELD_ACCOUNT_OWNER" 
+			/>
+			<field 
+				name="company_iban" 
+				type="text"	
+				default='CH0000'		
+				label="COM_TSWRENT_FIELD_IBAN" 
+			/>
+			<field 
+				name="company_currency" 
+				type="text" 	
+				label="COM_TSWRENT_FIELD_CURRENCY"
+				default='CHF' 
+			/>
+|		</fieldset>
+	</fieldset>
+
+	<fieldset
+		name="permissions"
+		label="JCONFIG_PERMISSIONS_LABEL"
+		description="JCONFIG_PERMISSIONS_DESC"
+		>
+		<field
+			name="rules"
+			type="rules"
+			label="JCONFIG_PERMISSIONS_LABEL"
+			validate="rules"
+			filter="rules"
+			component="com_foos"
+			section="component"
+		/>
+	</fieldset>
+</config>
