@@ -212,43 +212,12 @@ class SupplierModel extends AdminModel
     {
             $id=$data['id']; 
 
-            //Save Suplyer/Brand relation 
-            $related_ids=$data['brand_ids'];
-            foreach( $related_ids as $k => $v)
-            {
-                $related_id[]= $v['brand_id'];
-            }
-            //clear empty and 0 item
-            if(!empty($related_id)){
-                $related_id = array_diff($related_id, array(0));
-            }
-            if(!empty($related_id))
-            {
-                $related_id= array_unique($related_id);
-                
-                TswrentHelper::saveSupplierBrandRelation($id,$related_id,'supplierbrand');
-            }else{
-                TswrentHelper::deleteSupplierBrandRelation($id,'supplierbrand');
-            }
+            //Save Suplier/Brand relation 
+            TswrentHelper::syncSupplierBrandRelation($id, $data['brand_ids'], 'supplierbrand');
             
             //Save Contact/Customer relation 
-            $contact_ids=$data['contact_ids'];
-            foreach( $contact_ids as $k => $v)
-            { 
-                $contact_id[]= $v['contact_id'];
-            }
-            //clear empty and 0 item
-            if(!empty($contact_id)){
-                $contact_id = array_diff($contact_id, array(0,''));
-            }
-            if(!empty($contact_id))
-            {
-                $contact_id= array_unique($contact_id);
-                
-                ContactHelper::saveContactRelation($id,$contact_id,'suppliercontact');
-            }else{
-                ContactHelper::deleteContactRelation($id,'suppliercontact');
-            }
+            ContactHelper::syncContactRelation($id, $data['contact_ids'], 'suppliercontact');
+            
          return parent::save($data);
     }
 

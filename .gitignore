@@ -96,4 +96,4 @@ ENV/
 # mkdocs
 /Componente
 com_tswrent.zip
-
+/.vscode

@@ -108,7 +108,7 @@
 			label="COM_TSWRENT_FIELD_CUSTOMERS"
 			default=""
 			multiple="true"
-			layout="joomla.form.field.subform.repeatable-table"
+			layout="joomla.form.field.subform.repeatable"
 			>
 			<form>
 				<fieldset>

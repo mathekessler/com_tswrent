@@ -64,8 +64,13 @@
 			label="JGLOBAL_EMAIL"
 			size="30"
 			class="inputbox"
-			validate="email" />
-			
+			validate="email" 
+			/>
+			<field 
+			name="supplier_logo" 
+			type="media"
+			required="false"
+		/>
 			<field
 			name="state"
 			type="list"

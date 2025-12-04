@@ -270,63 +270,11 @@ class ContactModel extends AdminModel
      */
     public function save($data)
     {   
-            $id=$data['id'];
-
-            //Save Contact/Supplier relation 
-            if(!empty($data['supplier_ids'])){
-                $supplier_ids=$data['supplier_ids'];
-                foreach( $supplier_ids as $k => $v)
-                { 
-                    $supplier_id[]= $v['supplier_id'];
-                }
-                //clear empty and 0 item
-                if(!empty($supplier_id)){
-                    $supplier_id = array_diff($supplier_id, array(0,''));
-                }
-                if(!empty($supplier_id))
-                {
-                    $supplier_id= array_unique($supplier_id);
-               
-                    ContactHelper::saveContactRelation($id,$supplier_id,'contactsupplier');
-                }else
-                {
-                    ContactHelper::deleteContactRelation($id,'contactsupplier');
-                }
-            } else{
-                
-                ContactHelper::deleteContactRelation($id,'contactsupplier');
-            }  
-
-            //Save Contact/Customer relation
-             
-            if(!empty($data['customer_ids'])){
-                $customer_ids=$data['customer_ids'];
-                foreach( $customer_ids as $k => $v)
-                { 
-                    $customer_id[]= $v['customer_id'];
-                }
-                //clear empty and 0 item
-                if(!empty($customer_id)){
-                    $customer_id = array_diff($customer_id, array(0,''));
-                }
-                if(!empty($customer_id))
-                {
-                    $customer_id= array_unique($customer_id);
-                
-                    ContactHelper::saveContactRelation($id,$customer_id,'contactcustomer');
-                }else{
-                    ContactHelper::deleteContactRelation($id,'contactcustomer');
-                }
-            }else{ContactHelper::deleteContactRelation($id,'contactcustomer');}
-                        
-            //Save Contact/tswrent relation 
-            if(!empty($data['tswrentemployee'])){            
-                ContactHelper::saveContactRelationEmployee($id,$data['tswrentemployee'],'tswrent');
-            }else{
-                ContactHelper::deleteContactRelationEmployee($id);
-            }
-        
-
+        $id = $data['id'];
+        // Übergabe der Subform-Arrays direkt an den Helper
+        ContactHelper::syncContactRelation($id, $data['supplier_ids'] ?? [], 'contactsupplier');
+        ContactHelper::syncContactRelation($id, $data['customer_ids'] ?? [], 'contactcustomer');
+        ContactHelper::syncContactRelationEmployee($id, $data['tswrentemployee'] ?? null, 'tswrent');
         return parent::save($data);
     }
 }

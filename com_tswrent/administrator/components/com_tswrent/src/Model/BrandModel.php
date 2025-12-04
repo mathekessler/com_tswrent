@@ -217,24 +217,9 @@ class BrandModel extends AdminModel
     {
         $input = Factory::getApplication()->getInput();
         $id=$data['id'];
-        $related_ids=$data['supplier_ids'];
-
-        foreach( $related_ids as $k => $v)
-        {
-            $related_id[]= $v['supplier_id'];
-        }
-        //clear empty and 0 item
-        if(!empty($related_id))
-        {
-            $related_id = array_diff($related_id, array(0));
-        }        
-        if(!empty($related_id))
-        {
-            $related_id= array_unique($related_id);
-            TswrentHelper::saveSupplierBrandRelation($id,$related_id,'brandsupplier');    
-        }else{
-            TswrentHelper::deleteSupplierBrandRelation($id,'brandsupplier');
-        }
+        
+        // Synchronisiere Relationen über Helper
+        TswrentHelper::syncSupplierBrandRelation($id, $data['supplier_ids'], 'brandsupplier');
 
         // Alter the title and published state for Save as Copy
         if ($input->get('task') == 'save2copy') {

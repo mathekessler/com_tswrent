@@ -158,10 +158,15 @@ class BrandsModel extends ListModel
      */
     public function getItems()
     {
+        // Ensure local cache container exists
+        if (!isset($this->cache) || !is_array($this->cache)) {
+            $this->cache = [];
+        }
+
         // Get a storage key.
         $store = $this->getStoreId('getItems');
 
-		// Try to load the data from internal storage.
+        // Try to load the data from internal storage.
         if (!empty($this->cache[$store])) {
             return $this->cache[$store];
         }
@@ -175,36 +180,16 @@ class BrandsModel extends ListModel
         }
 
         // Get the clients in the list.
-        $db        = $this->getDatabase();
         $brandIds = array_column($items, 'id');
 
-        
-		$query = $db->getQuery(true)
-            ->select(
-                [
-					$db->quoteName('a.id'),
-					$db->quoteName('a.title'),               
-                    $db->quoteName('a.brand_id'),
-					$db->quoteName('a.state'),
-                    'COUNT(' . $db->quoteName('a.brand_id') . ') AS ' . $db->quoteName('count_products'),
-                ]
-            )
-            ->from($db->quoteName('#__tswrent_products','a'))
-            ->whereIn($db->quoteName('a.brand_id'), $brandIds)
-            ->group($db->quoteName('a.brand_id'));
-
-        $db->setQuery($query);
-
-        // Get the published Products count.
-        try {
-            $countProducts = $db->loadAssocList('brand_id', 'count_products');
-        } catch (\RuntimeException $e) {
-            $this->setError($e->getMessage());
-
-            return false;
+        // only run counts if we have brand IDs
+        if (!empty($brandIds)) {
+			$countProducts = [];
+			$countSuppliers = [];
+            
+			$countProducts = $this->countProducts($brandIds) ?: [];
+			$countSuppliers = $this->countSupplier($brandIds) ?: [];
         }
-
-		$countSuppliers = $this->countSupplier($brandIds);
 
         // Inject the values back into the array.
         foreach ($items as $item) {
@@ -277,25 +262,56 @@ class BrandsModel extends ListModel
 		->select(
 			[
 				$db->quoteName('brand_id'),
-				'COUNT(' . $db->quoteName('brand_id') . ') AS ' . $db->quoteName('count_published'),
+				'COUNT(' . $db->quoteName('brand_id') . ') AS ' . $db->quoteName('count_suppliers'),
 			]
 		)
 		->from($db->quoteName('#__tswrent_brand_supplier_relation'))
 		->whereIn($db->quoteName('brand_id'), $brandIds)
 		->group($db->quoteName('brand_id'));
 
-	$db->setQuery($query);
+		$db->setQuery($query);
 
-	// Get the published banners count.
-	try {
-		$state          = 1;
-		$countPublished = $db->loadAssocList('brand_id', 'count_published');
-	} catch (\RuntimeException $e) {
-		$this->setError($e->getMessage());
+		// Get the published banners count.
+		try {
+			$state          = 1;
+			$countPublished = $db->loadAssocList('brand_id', 'count_suppliers');
+		} catch (\RuntimeException $e) {
+			$this->setError($e->getMessage());
 
-		return false;
-	}
+			return false;
+		}
 
 		return ($countPublished);
 	}
+
+	protected function countProducts($brandIds)
+	{
+		$db        = $this->getDatabase();
+		$query = $db->getQuery(true)
+		->select(
+			[
+				$db->quoteName('a.brand_id'),
+				$db->quoteName('a.state'),
+				'COUNT(' . $db->quoteName('a.brand_id') . ') AS ' . $db->quoteName('count_products'),
+			]
+		)
+		->from($db->quoteName('#__tswrent_products', 'a'))
+		->whereIn($db->quoteName('a.brand_id'), $brandIds)
+		->where($db->quoteName('a.state') . ' = 1')
+		->group($db->quoteName('a.brand_id'));
+
+		$db->setQuery($query);
+
+		// Get the published banners count.
+		try {
+			$state          = 1;
+			$countProducts = $db->loadAssocList('brand_id', 'count_products');
+			return ($countProducts);
+		} catch (\RuntimeException $e) {
+			$this->setError($e->getMessage());
+
+			return false;
+		}
+	}	
+
 }

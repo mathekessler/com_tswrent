@@ -12,9 +12,7 @@ namespace TSWEB\Component\Tswrent\Administrator\Helper;
 use Joomla\CMS\Factory;
 use Joomla\Database\ParameterType;
 
-// phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
-// phpcs:enable PSR1.Files.SideEffects
 
 /**
  * Tswrent component helper.
@@ -131,157 +129,110 @@ class ContactHelper
         }
     }
 
- 
-	/**
-     * delete Contact Relation suplier/customer
-     *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
-    */
-    public static function deleteContactRelation(int $id, string $switch)
-    {
-        $columns = self::getRelationColumns($switch);
-         if (!$columns || empty($id)) {
-            return false;
-        }
-        [$col1, $col2] = $columns;
-        
-        try
-        {
-            $db    = Factory::getDbo();
-        
-            // Build delete query. We cast the id to int directly to avoid incorrect bind usage here.
-            $query = $db->getQuery(true)
-                ->delete($db->quoteName('#__tswrent_contact_relation'))
-                ->where($db->quoteName($col2) . ' = ' . (int) $id)
-                ->where($db->quoteName($col1) . ' != 0')
-                ->where($db->quoteName('tswrent') . ' = 0');
-            
-            $db->setQuery($query); 
-        
-            $db->execute();
-
-            return true ;
-
-        } catch (\Exception $e) {
-            Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-        }      
-    }
 
     /**
-     * delete Contact Relation Employee
+     * Synchronisiert die Contact-Relation für tswrent-Employee (speichern/löschen)
      *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
-    */
-    public static function deleteContactRelationEmployee(int $id)
+     * @param int $id Kontakt-ID
+     * @param mixed $value Wert aus dem Formular (z.B. 1 für aktiv, leer/null für löschen)
+     * @param string $switch Relationstyp ('tswrent')
+     * @return bool
+     */
+    public static function syncContactRelationEmployee(int $id, $value, string $switch = 'tswrent'): bool
     {
-        try
-        {
-            $db    = Factory::getDbo();
-        
-            // Build delete query. We cast the id to int directly to avoid incorrect bind usage here.
+        try {
+            $db = Factory::getDbo();
+            // Immer zuerst löschen
             $query = $db->getQuery(true)
                 ->delete($db->quoteName('#__tswrent_contact_relation'))
                 ->where($db->quoteName('contact_id') . ' = :contact_id')
                 ->where($db->quoteName('tswrent') . ' = 1')
                 ->bind(':contact_id', $id, ParameterType::INTEGER);
-            
-            $db->setQuery($query);  
-            
+            $db->setQuery($query);
             $db->execute();
-            
-            return true ;
 
-        } catch (\Exception $e) {
-            Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-        }        
-    }
-        /**
-     * save Contact Relation Employee
-     *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
-    */
-    public static function saveContactRelationEmployee(int $id)
-    {
-        self::deleteContactRelationEmployee($id);
-        try{
-            $db    = Factory::getDbo();
-        
-            // Build insert query.}
-            $query = $db->getQuery(true)
+            // Nur speichern, wenn Wert gesetzt/aktiv
+            if (!empty($value)) {
+                $query = $db->getQuery(true)
                     ->insert($db->quoteName('#__tswrent_contact_relation'))
                     ->columns([$db->quoteName('contact_id'), $db->quoteName('tswrent')])
                     ->values(':contact_id, 1')
                     ->bind(':contact_id', $id, ParameterType::INTEGER);
-            $db->setQuery($query);
-            $db->execute();
-    
-            return true ;
+                $db->setQuery($query);
+                $db->execute();
+            }
+            return true;
         } catch (\Exception $e) {
             Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+            return false;
         }
-
     }
 	
 
     /**
-     * Check/Save/Update the Relation from Supplier/Customer to the contact
+     * Synchronisiert Contact-Relationen (Supplier, Customer, etc.)
      *
-     * @return  array
-     * 
-     *  @since   __BUMP_VERSION__
+     * @param int $id Kontakt-ID (oder Supplier/Customer, je nach Switch)
+     * @param array $relatedIds Array der zu verknüpfenden IDs (z.B. aus Subform)
+     * @param string $switch Relationstyp (z.B. 'contactsupplier', 'contactcustomer', ...)
+     * @return bool
      */
-    public static function saveContactRelation(int $id, array $relatedIds, string $switch): bool
+    public static function syncContactRelation(int $id, array $relatedIds, string $switch): bool
     {
         $columns = self::getRelationColumns($switch);
-
-        if (!$columns || empty($id)) {
+        if (!$columns) {
             return false;
         }
-
-        [$col1, $col2] = $columns;
-        $db    = Factory::getDbo();
-
-        $query = $db->getQuery(true);
-        $query->select($col1)
+        [$col1, $col2, $table] = $columns;
+        if (!$col1 || !$col2) {
+            return false;
+        }
+        $db = Factory::getDbo();
+        // Subform-Array direkt filtern (z.B. ['supplier_id'=>1], ['customer_id'=>1], ...)
+        if (!empty($relatedIds) && is_array($relatedIds) && is_array(reset($relatedIds))) {
+            $relatedIds = array_filter(array_map(function($v) use ($col1) {
+                return !empty($v[$col1]) ? (int)$v[$col1] : null;
+            }, $relatedIds));
+        } else {
+            $relatedIds = array_filter(array_map('intval', $relatedIds));
+        }
+        // Aktuelle Relationen abrufen
+        $query = $db->getQuery(true)
+            ->select($db->quoteName($col1))
             ->from($db->quoteName('#__tswrent_contact_relation'))
-            ->where($col2 . ' = ' . (int) $id)
-            ->where($col1 . ' != 0');
-
+            ->where($db->quoteName($col2) . ' = :id')
+            ->where($db->quoteName($col1) . ' != 0')
+            ->bind(':id', $id, ParameterType::INTEGER)
+            ->order($db->quoteName($col1));
         $db->setQuery($query);
         $current = $db->loadColumn() ?: [];
-
         $toDelete = array_diff($current, $relatedIds);
         $toInsert = array_diff($relatedIds, $current);
-        $success = true;
-
+        $ret = true;
+        // Löschen: Nur die jeweilige Relation entfernen
         if (!empty($toDelete)) {
-            $query = $db->getQuery(true)
-                ->delete($db->quoteName('#__tswrent_contact_relation'))
-                ->where($col2 . ' = ' . (int) $id)
-                ->whereIn($col1, $toDelete);
-            $db->setQuery($query);
-            $success &= $db->execute() !== false;
-        }
-
-        if (!empty($toInsert)) {
-            $query = $db->getQuery(true)
-                ->insert($db->quoteName('#__tswrent_contact_relation'))
-                ->columns([$col1, $col2]);
-
-            foreach ($toInsert as $relatedId) {
-                $query->values((int) $relatedId . ', ' . $id);
+            foreach ($toDelete as $deleteId) {
+                $query = $db->getQuery(true)
+                    ->delete($db->quoteName('#__tswrent_contact_relation'))
+                    ->where($db->quoteName($col2) . ' = :id')
+                    ->where($db->quoteName($col1) . ' = :deleteId')
+                    ->bind(':id', $id, ParameterType::INTEGER)
+                    ->bind(':deleteId', $deleteId, ParameterType::INTEGER);
+                $db->setQuery($query);
+                $ret = $ret && $db->execute();
             }
-
-            $db->setQuery($query);
-            $success &= $db->execute() !== false;
         }
-
-        return $success;
+        // Einfügen
+        if (!empty($toInsert)) {
+            foreach ($toInsert as $insertId) {
+                $query = $db->getQuery(true)
+                    ->insert($db->quoteName('#__tswrent_contact_relation'))
+                    ->columns([$db->quoteName($col1), $db->quoteName($col2)])
+                    ->values((int)$insertId . ', ' . (int)$id);
+                $db->setQuery($query);
+                $ret = $ret && $db->execute();
+            }
+        }
+        return $ret;
     }
 }

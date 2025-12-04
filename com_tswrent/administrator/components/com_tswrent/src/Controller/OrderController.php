@@ -144,6 +144,7 @@ class OrderController extends FormController
     {
         $app = Factory::getApplication();
         $id  = $this->input->getInt('id');
+        $overwrite = $this->input->getInt('overwrite', 0);
 
         // Erst prüfen: wurde der Datensatz bereits gespeichert (id > 0)?
         if ($id <= 0) {
@@ -193,11 +194,13 @@ class OrderController extends FormController
                 $app->redirect(Route::_('index.php?option=com_tswrent&view=orders', false));
                 return;
         }
+        
+        $saveToFile = true;
 
         $pdf = new OrderDocument(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
         
         // Generate and output the PDF
-        $pdf->generate($order, $documentType);
+        $pdf->generate($order, $documentType, $saveToFile);
         
         $app->close();
     }

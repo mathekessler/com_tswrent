@@ -7,20 +7,16 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-// phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
-// phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\String\PunycodeHelper;
 use \Joomla\CMS\Layout\LayoutHelper;
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
-	->useScript('form.validate')
-	->useScript('inlinehelp');
+	->useScript('form.validate');
 
 ?>
 <form action="<?php echo Route::_('index.php?option=com_tswrent&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="customer-form" aria-label="<?php echo Text::_('COM_TSWRENT_CUSTOMER_' . ((int) $this->item->id === 0 ? 'NEW' : 'EDIT'), true); ?>"class="form-validate">	
@@ -29,14 +25,18 @@ $wa->useScript('keepalive')
 			<div class="row">
 				<div class="col-md-12">
 					<div id="j-main-container" class="j-main-container">	
-						<?php /** load Supplier Address Layout **/
-							$data_address= ['address' => $this->item];  // Prepare data to pass
+						<?php /** load customer Address Layout **/
+							$data_address = [
+										'address' => $this->item,
+										'view' => [
+											'view' => 'customer',
+											'id' => $this->item->id
+										],
+										'logo' => $this->item->customer_logo							
+									];// Prepare data to pass
 							echo LayoutHelper::render('address', $data_address, 'com_tswrent.layouts');  // Load the layout 
-							echo Text::_('COM_TSWRENT_DOWNLOAD_INFORMATION_AS'); 
+							 
 						?>
-						<a href="<?php echo Route::_('index.php?option=com_tswrent&view=customer&&id=' . $this->item->id . '&format=vcf'); ?>">
-							<?php echo Text::_('COM_TSWRENT_VCARD'); ?>
-						</a>
 					</div>
 				</div>
 			</div>

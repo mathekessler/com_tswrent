@@ -59,6 +59,12 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
 								<th scope="col" >
 									<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'state', $listDirn, $listOrder); ?>
 								</th>
+								<th scope="col" class="w-3 text-center d-none d-md-table-cell">
+                                    <span title="<?php echo Text::_('COM_TSWREN_CUSTPMER'); ?>"><?php echo Text::_('COM_TSWREN_CUSTOMER'); ?></span>
+                                </th>
+								<th scope="col" class="w-3 text-center d-none d-md-table-cell">
+                                    <span title="<?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?>"><?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?></span>
+                                </th>
 								<th scope="col" class="w-1 text-center d-none d-md-table-cell">
 									<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 								</th>
@@ -89,6 +95,19 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                             <?php else : ?>
                                                 <?php echo $this->escape($item->title); ?>
                                             <?php endif; ?>
+											
+											<td class="text-center d-none d-md-table-cell">
+											  <a class="btn <?php echo ($item->count_customers > 0) ? 'btn-success' : 'btn-secondary'; ?>"
+												 href="<?php echo Route::_('index.php?option=com_tswrent&view=customers&filter[contact_id]=' . (int) $item->id ); ?>">
+												<?php echo (int) $item->count_customers; ?>
+											  </a>
+											</td>
+											<td class="text-center d-none d-md-table-cell">
+											  <a class="btn <?php echo ($item->count_suppliers > 0) ? 'btn-success' : 'btn-secondary'; ?>"
+												 href="<?php echo Route::_('index.php?option=com_tswrent&view=suppliers&filter[contact_id]=' . (int) $item->id ); ?>">
+												<?php echo (int) $item->count_suppliers; ?>
+											  </a>
+											</td>
                                         </div>
                                     </th>
 									<td class="d-none d-md-table-cell">

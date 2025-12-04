@@ -40,7 +40,7 @@ $listOrder= $displayData['listOrder'];
                         <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_PRICE', 'a.price', $listDirn, $listOrder); ?>
                     </th>
                     <th scope="col" class="d-none d-md-table-cell">
-                        <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_UNIT', 'a.unit', $listDirn, $listOrder); ?>
+                        <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_STOCK', 'a.stock', $listDirn, $listOrder); ?>
                     </th>
                 </tr>
             </thead>
@@ -64,7 +64,7 @@ $listOrder= $displayData['listOrder'];
                         </td>
                         <td>
                             <div >
-                                <?php echo $this->escape($item->unit); ?>
+                                <?php echo $this->escape($item->stock); ?>
                             </div>
                         </td>
                     </tr>

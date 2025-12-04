@@ -226,15 +226,14 @@ class CustomerModel extends AdminModel
 
     // Save contact relations
     $related_id = [];
-    foreach ($related_ids as $v) {
-        $related_id[] = $v['contact_id'];
+    if (!empty($related_ids)) {
+        foreach ($related_ids as $v) {
+            if (!empty($v['contact_id'])) {
+                $related_id[] = (int)$v['contact_id'];
+            }
+        }
     }
-    $related_id = array_filter(array_unique($related_id)); // remove 0/empty
-    if (!empty($related_id)) {
-        ContactHelper::saveContactRelation($id, $related_id, 'customercontact');
-    } else {
-        ContactHelper::deleteContactRelation($id, 'customercontact');
-    }
+    ContactHelper::syncContactRelation($id, $related_id, 'customercontact');
 
     // Save the main record first
     $success = parent::save($data);

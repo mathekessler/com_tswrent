@@ -8,28 +8,25 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+// phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
+// phpcs:enable PSR1.Files.SideEffects
 
-use Joomla\CMS\Button\PublishedButton;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
-/** @var \Joomla\Component\Tswrent\Administrator\View\Products\HtmlView $this */
-
 /** @var \Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('table.columns')
     ->useScript('multiselect');
 
-$app       = Factory::getApplication();
-$user      = $this->getCurrentUser();
-$userId    = $user->id;
+$user      = Factory::getUser();
+$userId    = $user->get('id');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
-$saveOrder = $listOrder == 'a.ordering';
 
 ?>
 
@@ -66,6 +63,9 @@ $saveOrder = $listOrder == 'a.ordering';
                                 </th>
                                 <th scope="col" class="w-10 d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'COM_TSWRENT_HEADING_BRAND', 'brand_title', $listDirn, $listOrder); ?>
+                                </th>
+                                <th scope="col" class="w-3 text-center d-none d-md-table-cell">
+                                    <span title="<?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?>"><?php echo Text::_('COM_TSWRENT_SUPPLIERS'); ?></span>
                                 </th>
                                 <th scope="col" class="w-5 d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
@@ -105,9 +105,16 @@ $saveOrder = $listOrder == 'a.ordering';
                                     <td class="small d-none d-md-table-cell">
                                         <?php echo $item->brand_title; ?>
                                     </td>
+                                    <td class="text-center btns d-none d-md-table-cell itemnumber">
+                                        <a class="btn <?php echo (!empty($item->count_suppliers) && $item->count_suppliers > 0) ? 'btn-success' : 'btn-secondary'; ?>" href="<?php echo Route::_('index.php?option=com_tswrent&view=suppliers&filter[brand_id]=' . (int) $item->brand_id ); ?>"
+                                        aria-describedby="tip-suppliers<?php echo $i; ?>">
+                                            <?php echo (int) ($item->count_suppliers ?? 0); ?>
+                                        </a>
+                                    </td>
                                     <td class="d-none d-md-table-cell">
                                         <?php echo $item->id; ?>
                                     </td>
+                                    
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

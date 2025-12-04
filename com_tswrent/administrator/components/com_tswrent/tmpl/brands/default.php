@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_tswrent
@@ -27,7 +28,8 @@ $userId    = $user->get('id');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 
-?>    
+?> 
+
 <form action="<?php echo Route::_('index.php?option=com_tswrent&view=brands'); ?>" method="post" name="adminForm" id="adminForm">
     <div class="row">
         <div class="col-md-12">
@@ -63,10 +65,10 @@ $listDirn  = $this->escape($this->state->get('list.direction'));
                                     <span ><?php echo Text::_('COM_TSWRENT_HEADING_WEBPAGE'); ?></span>
                                 </th>
                                 <th scope="col" class="w-3 text-center d-none d-md-table-cell">
-                                    <span  title="<?php echo Text::_('COM_TSWREN_PRODUCTS'); ?>"><?php echo Text::_('COM_TSWREN_PRODUCTS'); ?></span>
+                                    <span  title="<?php echo Text::_('COM_TSWRENT_PRODUCTS'); ?>"><?php echo Text::_('COM_TSWRENT_PRODUCTS'); ?></span>
                                 </th>
-                                <th scope="col" class="w-3 text-center d-none d-md-table-cell">
-                                    <span  title="<?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?>"><?php echo Text::_('COM_TSWREN_SUPPLIERS'); ?></span>
+                                <th scope="col" class="w-3 text-center d-none d-md-table-cell"> 
+                                    <span  title="<?php echo Text::_('COM_TSWRENT_SUPPLIERS'); ?>"><?php echo Text::_('COM_TSWRENT_SUPPLIERS'); ?></span>
                                 </th>
                                 <th scope="col" class="w-5 d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>

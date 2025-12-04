@@ -32,6 +32,11 @@
 			filter="url"
 			validate="url"
 		/>
+		<field 
+			name="brand_logo" 
+			type="media"
+			required="false"
+		/>
 		<field
 			name="state"
 			type="list"

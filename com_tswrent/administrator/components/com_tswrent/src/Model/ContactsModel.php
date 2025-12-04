@@ -10,6 +10,7 @@
 
 namespace TSWEB\Component\Tswrent\Administrator\Model;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
@@ -122,6 +123,64 @@ class ContactsModel extends ListModel
 	}
 
 	/**
+	 * Overrides getItems to attach supplier counts (by product's brand) and
+	 * to provide a request-local cache and guarded queries.
+	 *
+	 * @return array
+	 */
+	public function getItems()
+	{
+		// Ensure local cache container exists
+		if (!isset($this->cache) || !is_array($this->cache)) {
+			$this->cache = [];
+		}
+
+		$store = $this->getStoreId('getItems');
+
+		// Return cached if available
+		if (!empty($this->cache[$store])) {
+			return $this->cache[$store];
+		}
+
+		// Load the base items
+		$items = parent::getItems();
+
+		if (empty($items)) {
+			return [];
+		}
+
+		// Collect contact IDs
+		$contactIds = array_column($items, 'id');
+		sort($contactIds);
+		
+		if (!empty($contactIds)) {
+			$countSuppliers = [];
+			$countCustomers = [];
+
+			$countSuppliers = $this->countSupplier($contactIds) ?: [];
+			$countCustomers = $this->countCustomer($contactIds) ?: [];
+
+		}
+
+		// Inject counts back into products
+		foreach ($items as $item) {
+			if (isset($item->id)) {
+				$item->count_suppliers = isset($countSuppliers[$item->id]) ? $countSuppliers[$item->id] : 0;
+				$item->count_customers = isset($countCustomers[$item->id]) ? $countCustomers[$item->id] : 0;
+			} else {
+				$item->count_suppliers = 0;
+				$item->count_customers = 0;
+			}
+		}
+
+		// Cache and return
+		$this->cache[$store] = $items;
+
+		return $this->cache[$store];
+	}
+
+
+	/**
 	 * Method to get a store id based on model configuration state.
 	 *
 	 * This is necessary because the model is used by the component and
@@ -139,6 +198,8 @@ class ContactsModel extends ListModel
 		// Compile the store id.
 		$id .= ':' . $this->getState('filter.search');
 		$id .= ':' . $this->getState('filter.published');
+		$id .= ':' . $this->getState('filter.customer_id');
+		$id .= ':' . $this->getState('filter.supplier_id');
 
 
 		return parent::getStoreId($id);
@@ -163,4 +224,53 @@ class ContactsModel extends ListModel
         // List state information.
         parent::populateState($ordering, $direction);
     }
+
+	protected function countSupplier($contactIds)
+	{
+		$db        = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('contact_id'),
+				'COUNT(' . $db->quoteName('contact_id') . ') AS ' . $db->quoteName('count_suppliers'),
+			])
+			->from($db->quoteName('#__tswrent_contact_relation'))
+			->whereIn($db->quoteName('contact_id'), $contactIds)
+			->where($db->quoteName('supplier_id') . ' > 0')
+			->group($db->quoteName('contact_id'));
+
+		$db->setQuery($query);		
+		try {
+			return $db->loadAssocList('contact_id', 'count_suppliers');
+		} catch (\RuntimeException $e) {
+			$this->setError($e->getMessage());
+			return false;
+		}
+
+	}
+	protected function countCustomer($contactIds)
+	{
+		$db = $this->getDatabase();
+
+		$query = $db->getQuery(true)
+			->select(
+				[
+					$db->quoteName('contact_id'),
+					'COUNT(' . $db->quoteName('customer_id') . ') AS ' . $db->quoteName('count_customers'),
+				]
+			)
+			->from($db->quoteName('#__tswrent_contact_relation'))
+			->whereIn($db->quoteName('contact_id'), $contactIds)
+			->where($db->quoteName('customer_id') . ' > 0')
+			->group($db->quoteName('contact_id'));
+
+		$db->setQuery($query);
+
+		try {
+			return $db->loadAssocList('contact_id', 'count_customers');
+		} catch (\RuntimeException $e) {
+			$this->setError($e->getMessage());
+			return false;
+		}
+
+	}
 }

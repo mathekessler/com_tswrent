@@ -1,15 +1,49 @@
-Config-->
+Parameter{
+    Bankverbindung zu Config verschieben
+}
+
+Config{
+    Bankverbindung -->
+        Hauptbankverbindung
+            Additional bankverbindung
+        
+        kurse zu Bankverbindungen verknüpfen
+
     Währung --> 
         Hauptwährung
             Additional währung --> Kurs zur hauptwährung
         de-DE / de-CH
-    MwSt -->
+
+    (MwSt -->
             MwSt Sätze definieren (19 / 8.5 ect.)
-            Standart definieren
+            Standart definieren)
+}
 
-Order -->
+Product{
+
+}
+
+Order{
     Währung ändern
-    MwSt Satz 
+    Bankverbindung ändern
+    (MwSt Satz )
+}
 
-Supplier/Customer/Brand -->
-    logo image
+Supplier{
+
+}
+
+Customer{
+
+}
+
+Brand{
+    
+}
+
+Contact{
+    image
+}
+
+
+//$app = Factory::getApplication();    $app->enqueueMessage(var_dump( $contactIds), true) ;

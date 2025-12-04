@@ -175,5 +175,69 @@ class ProductsModel extends ListModel
         parent::populateState($ordering, $direction);
     }
 
+	/**
+	 * Overrides getItems to attach supplier counts (by product's brand) and
+	 * to provide a request-local cache and guarded queries.
+	 *
+	 * @return array
+	 */
+	public function getItems()
+	{
+		// Ensure local cache container exists
+		if (!isset($this->cache) || !is_array($this->cache)) {
+			$this->cache = [];
+		}
+
+		$store = $this->getStoreId('getItems');
+
+		// Return cached if available
+		if (!empty($this->cache[$store])) {
+			return $this->cache[$store];
+		}
+
+		// Load the base items
+		$items = parent::getItems();
+
+		if (empty($items)) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+
+		// Collect brand IDs from products
+		$brandIds = array_values(array_filter(array_unique(array_column($items, 'brand_id'))));
+
+		$countSuppliers = [];
+		if (!empty($brandIds)) {
+			$query = $db->getQuery(true)
+				->select([
+					$db->quoteName('bsr.brand_id'),
+					'COUNT(' . $db->quoteName('bsr.supplier_id') . ') AS ' . $db->quoteName('count_suppliers'),
+				])
+				->from($db->quoteName('#__tswrent_brand_supplier_relation', 'bsr'))
+				->whereIn($db->quoteName('bsr.brand_id'), $brandIds)
+				->group($db->quoteName('bsr.brand_id'));
+
+			$db->setQuery($query);
+			try {
+				$countSuppliers = $db->loadAssocList('brand_id', 'count_suppliers');
+			} catch (\RuntimeException $e) {
+				$this->setError($e->getMessage());
+				return [];
+			}
+		}
+
+		// Inject counts back into products
+		foreach ($items as $item) {
+			$bid = $item->brand_id ?? null;
+			$item->count_suppliers = ($bid && isset($countSuppliers[$bid])) ? (int) $countSuppliers[$bid] : 0;
+		}
+
+		// Cache and return
+		$this->cache[$store] = $items;
+
+		return $this->cache[$store];
+	}
+
 }
 

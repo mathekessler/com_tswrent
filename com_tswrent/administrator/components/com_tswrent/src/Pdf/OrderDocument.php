@@ -6,6 +6,7 @@ namespace TSWEB\Component\Tswrent\Administrator\Pdf;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Date\Date;
 use Joomla\CMS\Component\ComponentHelper;
 use TSWEB\Component\Tswrent\Administrator\Pdf\TemplateRenderer;
 
@@ -116,10 +117,11 @@ class OrderDocument extends \TCPDF
      *
      * @param   object  $order         The order data. 
      * @param   string  $documentType  The type of the document (e.g., 'Offer', 'Invoice').
+     * @param   bool    $saveToFile    Whether to save the PDF to a file instead of outputting. Default: false
      *
-     * @return  void
+     * @return  string|void  The file path if $saveToFile is true, void otherwise.
      */
-    public function generate(object $order, string $documentType): void
+    public function generate(object $order, string $documentType, bool $saveToFile = false)
     {
         // Daten an die PDF-Klasse übergeben
         $this->order = $order;
@@ -173,11 +175,23 @@ class OrderDocument extends \TCPDF
         $this->SetFont('helvetica', '', 10);
         //$dataY = 85; // Start-Y-Position
 
+        // Get the date format from the language file to support localization.
+        $dateFormat = Text::_('COM_TSWRENT_PDF_DATETIME_FORMAT');
+
+        $startDateFormatted = '';
+        if (!empty($this->order->startdate)) {
+            $startDateFormatted = (new Date($this->order->startdate))->format($dateFormat);
+        }
+        $endDateFormatted = '';
+        if (!empty($this->order->enddate)) {
+            $endDateFormatted = (new Date($this->order->enddate))->format($dateFormat);
+        }
+
         $documentData = [
             Text::_('COM_TSWRENT_PDF_CONTACT') => trim((string) ($this->order->contact_detail->prename ?? '') . ' ' . ($this->order->contact_detail->name ?? '')),
             Text::_('COM_TSWRENT_PDF_CUSTOMER_CONTACT') => trim((string) ($this->order->c_contact_detail->prename ?? '') . ' ' . ($this->order->c_contact_detail->name ?? '')),
             Text::_('COM_TSWRENT_PDF_PROJECT_ADDRESS') => trim((($this->order->venue_name ?? '') . ' - ' . ($this->order->address ?? '') . ' - ' . ($this->order->postalcode ?? '') . ' ' . ($this->order->city ?? ''))),
-            Text::_('COM_TSWRENT_PDF_PROJECT_DATE') => (($this->order->startdate ?? '') . ' - ' . ($this->order->enddate ?? '')),
+            Text::_('COM_TSWRENT_PDF_PROJECT_DATE') => ($startDateFormatted . ' - ' . $endDateFormatted),
         ];
 
         foreach ($documentData as $label => $value) {
@@ -197,6 +211,27 @@ class OrderDocument extends \TCPDF
         }
 
         // Close and output PDF document
-        $this->Output('order_' . $this->order->id . '_' . $documentType . '.pdf', 'I'); // 'D' = Download, 'I' = Inline im Browser
+        $orderId = str_pad($this->order->id, 6, '0', STR_PAD_LEFT);
+        $filename = 'order_' . $orderId . '_' . $documentType . '.pdf';
+        
+        // Wenn $saveToFile true ist, wird die Datei auf dem Server gespeichert.
+        if ($saveToFile) { // Controller hat entschieden: Speichern und Überschreiben
+            // Speichere PDF-Datei im Verzeichnis /images/tswrent/Order_{ID}
+            $uploadDir = JPATH_ROOT . '/images/tswrent/Order_'. $orderId ;
+            
+            // Erstelle Ordner, falls er nicht existiert
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $filePath = $uploadDir . '/' . $filename;
+            $this->Output($filePath, 'F');
+            $this->Output($filename, 'I');
+
+            return $filePath;
+        } else {
+            // Controller hat entschieden: Nur im Browser anzeigen, nicht speichern.
+            $this->Output($filename, 'I');
+        }
     }
 }
